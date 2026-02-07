@@ -2,6 +2,7 @@
 node_modules/       # optional, but recommended
 npm-debug.log
 yarn-error.log
+
 .env
 
 # Logs
