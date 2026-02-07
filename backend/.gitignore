@@ -18,3 +18,9 @@ Thumbs.db
 # User uploads
 upload/
 uploads/
+
+# Security - exclude generated keys (Issue #12)
+*.pem
+
+# Test coverage (Issue #13)
+coverage/
