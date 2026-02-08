@@ -117,10 +117,11 @@ exports.unfollowUser = async (req, res) => {
 
       const inboxUrl = targetActor + "/inbox";
 
-      const headers = signRequest({
+      const headers = await signRequest({
         actor: currentActor,
         inboxUrl,
-        body: undoActivity
+        body: undoActivity,
+        username: currentUser.username
       });
 
       await axios.post(inboxUrl, undoActivity, { headers });

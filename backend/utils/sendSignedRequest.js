@@ -2,15 +2,24 @@
 // sendSignedRequest.js
 const crypto = require("crypto");
 const axios = require("axios");
-const fs = require("fs");
-const path = require("path");
+const User = require("../models/User");
 
 const sendSignedRequest = async (actorUsername, inboxUrl, activity) => {
   try {
+    // Validate username
+    if (!actorUsername || actorUsername === "undefined") {
+      throw new Error("Invalid username: username cannot be undefined or empty");
+    }
+
     const actorUrl = `${process.env.DOMAIN}/users/${actorUsername}`;
 
-    const privateKeyPath = path.join(__dirname, "../private.pem");
-    const privateKey = fs.readFileSync(privateKeyPath, "utf8");
+    // Load user-specific private key from database
+    const user = await User.findOne({ username: actorUsername }).select("+privateKey");
+    if (!user || !user.privateKey) {
+      throw new Error(`Private key not found for user: ${actorUsername}`);
+    }
+
+    const privateKey = user.privateKey;
 
     const date = new Date().toUTCString();
     const digest = crypto

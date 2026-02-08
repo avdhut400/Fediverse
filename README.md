@@ -116,6 +116,26 @@ npm install
 npm run dev
  
 ```
+
+---
+
+## 🔐 Security & Key Management
+
+This project uses **per-user RSA key pairs** for ActivityPub federation. Each user automatically gets their own unique keypair stored securely in the database during registration.
+
+### Key Features
+- ✅ **Automatic key generation** - No manual setup required
+- ✅ **Database storage** - Keys stored securely in MongoDB
+- ✅ **Per-user isolation** - Each actor has unique keys
+- ✅ **Username validation** - Prevents undefined or empty usernames
+
+### Important Notes
+- **DO NOT** run `genKey.js` - It's deprecated (creates server-wide keys)
+- **DO NOT** use `utils/keys.js` - File-based system is deprecated
+- Keys are automatically managed by the User model
+
+📖 **For detailed information**, see [KEY_MANAGEMENT.md](./KEY_MANAGEMENT.md)
+
 ---
 ### ActivityPub Endpoints
 WebFinger: /.well-known/webfinger

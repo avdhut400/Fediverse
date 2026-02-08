@@ -1,19 +1,15 @@
 
-const fs = require('fs');
-const path = require('path');
 const axios = require('axios');
 const { v4: uuidv4 } = require("uuid");
 const User = require('../models/User');
 const Post = require("../models/Post");
-const signRequest  = require("../utils/httpSignature");
+const signRequest = require("../utils/httpSignature");
 const fetchInboxUrl = require("../utils/fetchInboxUrl");
-const {sendSignedRequest} = require("../utils/sendSignedRequest");
+const { sendSignedRequest } = require("../utils/sendSignedRequest");
 
-const publicKey = fs.readFileSync(path.join(__dirname, '../public.pem'), 'utf8');
- 
 exports.webfinger = async (req, res) => {
   console.log("📡 Webfinger called with:", req.query.resource);
-  
+
   const resource = req.query.resource;
   const username = resource?.split(":")[1]?.split("@")[0];
   const host = req.headers.host;
@@ -50,6 +46,12 @@ exports.actor = async (req, res) => {
   const { username } = req.params;
   console.log("👤 Actor requested:", username);
 
+  // Validate username
+  if (!username || username === "undefined") {
+    console.log("❌ Invalid username:", username);
+    return res.status(400).json({ error: "Invalid username" });
+  }
+
   const user = await User.findOne({ username });
   if (!user) {
     console.log("❌ User not found:", username);
@@ -57,6 +59,13 @@ exports.actor = async (req, res) => {
   }
 
   console.log("✅ User found:", user.username);
+
+  // Use user-specific public key from database
+  const publicKeyPem = user.publicKey;
+  if (!publicKeyPem) {
+    console.log("❌ Public key not found for user:", username);
+    return res.status(500).json({ error: "Public key not configured" });
+  }
 
   res.setHeader("Content-Type", "application/activity+json");
   return res.json({
@@ -71,7 +80,7 @@ exports.actor = async (req, res) => {
     publicKey: {
       id: `${process.env.BASE_URL}/users/${username}#main-key`,
       owner: `${process.env.BASE_URL}/users/${username}`,
-      publicKeyPem: publicKey,
+      publicKeyPem: publicKeyPem,
     },
     icon: {
       type: "Image",
@@ -208,7 +217,7 @@ exports.getFollowers = async (req, res) => {
   if (!user) return res.status(404).json({ error: "User not found" });
 
   // Remove trailing '/inbox' if present
-  const cleanedFollowers = user.followers.map(url => 
+  const cleanedFollowers = user.followers.map(url =>
     url.replace(/\/inbox$/, "")
   );
 
@@ -289,12 +298,12 @@ exports.outbox = async (req, res) => {
         to: ["https://www.w3.org/ns/activitystreams#Public"],
         attachment: post.imageUrl
           ? [
-              {
-                type: "Image",
-                mediaType: "image/jpeg",
-                url: post.imageUrl,
-              },
-            ]
+            {
+              type: "Image",
+              mediaType: "image/jpeg",
+              url: post.imageUrl,
+            },
+          ]
           : [],
       },
     }));

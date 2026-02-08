@@ -2,12 +2,21 @@
 
 const crypto = require("crypto");
 const url = require("url");
-const fs = require("fs");
-const path = require("path");
+const User = require("../models/User");
 
-const privateKey = fs.readFileSync(path.join(__dirname, "../private.pem"), "utf8");
+async function signRequest({ inboxUrl, actor, body, username }) {
+  // Validate username
+  if (!username || username === "undefined") {
+    throw new Error("Invalid username: username cannot be undefined or empty");
+  }
 
-function signRequest({ inboxUrl, actor, body }) {
+  // Load user-specific private key from database
+  const user = await User.findOne({ username }).select("+privateKey");
+  if (!user || !user.privateKey) {
+    throw new Error(`Private key not found for user: ${username}`);
+  }
+
+  const privateKey = user.privateKey;
   const parsed = url.parse(inboxUrl);
   const date = new Date().toUTCString();
 
