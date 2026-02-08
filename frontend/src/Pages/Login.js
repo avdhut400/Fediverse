@@ -1,5 +1,5 @@
 
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import API from "../utils/api";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
@@ -10,6 +10,32 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
+
+  // Handle Google OAuth callback
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+    const userStr = params.get("user");
+    const error = params.get("error");
+
+    if (error) {
+      alert(`Authentication failed: ${error}`);
+      return;
+    }
+
+    if (token && userStr) {
+      try {
+        const user = JSON.parse(decodeURIComponent(userStr));
+        login(token);
+        localStorage.setItem("username", user.username);
+        alert("Google login successful!");
+        navigate("/");
+      } catch (err) {
+        console.error("Error processing Google login:", err);
+        alert("Error processing login response");
+      }
+    }
+  }, []);
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -51,6 +77,10 @@ function Login() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href = "http://localhost:4000/api/auth/google";
   };
 
   return (
@@ -106,6 +136,23 @@ function Login() {
             disabled={loading}
           >
             {loading ? "Logging in..." : "Login"}
+          </button>
+
+          <div className="my-3 text-center">
+            <span className="text-muted">or</span>
+          </div>
+
+          <button
+            className="btn btn-outline-secondary w-100"
+            type="button"
+            onClick={handleGoogleLogin}
+          >
+            <img 
+              src="https://www.google.com/favicon.ico" 
+              alt="Google" 
+              style={{ width: "16px", marginRight: "8px" }}
+            />
+            Sign in with Google
           </button>
         </form>
       </div>

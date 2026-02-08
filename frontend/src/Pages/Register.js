@@ -1,7 +1,8 @@
 
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import API from "../utils/api";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 export default function Signup() {
   const [formData, setFormData] = useState({
@@ -13,6 +14,33 @@ export default function Signup() {
   const [step, setStep] = useState("register"); // 'register' or 'verify'
   const [validated, setValidated] = useState(false);
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
+
+  // Handle Google OAuth callback
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+    const userStr = params.get("user");
+    const error = params.get("error");
+
+    if (error) {
+      alert(`Authentication failed: ${error}`);
+      return;
+    }
+
+    if (token && userStr) {
+      try {
+        const user = JSON.parse(decodeURIComponent(userStr));
+        login(token);
+        localStorage.setItem("username", user.username);
+        alert("Google registration successful!");
+        navigate("/");
+      } catch (err) {
+        console.error("Error processing Google registration:", err);
+        alert("Error processing registration response");
+      }
+    }
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -56,6 +84,10 @@ export default function Signup() {
     }
   };
 
+  const handleGoogleLogin = () => {
+    window.location.href = "http://localhost:4000/api/auth/google";
+  };
+
   return (
     <div className="login-page d-flex align-items-center justify-content-center">
       <div className="login-card shadow">
@@ -64,71 +96,90 @@ export default function Signup() {
         </h2>
 
         {step === "register" ? (
-          <form
-            noValidate
-            className={`needs-validation ${validated ? "was-validated" : ""}`}
-            onSubmit={handleSignup}
-          >
-            {/* Username */}
-            <div className="form-floating mb-3">
-              <input
-                type="text"
-                name="username"
-                id="floatingUsername"
-                className="form-control"
-                placeholder="Username"
-                value={formData.username}
-                onChange={handleChange}
-                required
-              />
-              <label htmlFor="floatingUsername">Username</label>
-              <div className="invalid-feedback">Please enter a username.</div>
-            </div>
+          <>
+            <form
+              noValidate
+              className={`needs-validation ${validated ? "was-validated" : ""}`}
+              onSubmit={handleSignup}
+            >
+              {/* Username */}
+              <div className="form-floating mb-3">
+                <input
+                  type="text"
+                  name="username"
+                  id="floatingUsername"
+                  className="form-control"
+                  placeholder="Username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  required
+                />
+                <label htmlFor="floatingUsername">Username</label>
+                <div className="invalid-feedback">Please enter a username.</div>
+              </div>
 
-            {/* Email */}
-            <div className="form-floating mb-3">
-              <input
-                type="email"
-                name="email"
-                id="floatingEmail"
-                className="form-control"
-                placeholder="Email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-              <label htmlFor="floatingEmail">Email address</label>
-              <div className="invalid-feedback">Please enter a valid email.</div>
-            </div>
+              {/* Email */}
+              <div className="form-floating mb-3">
+                <input
+                  type="email"
+                  name="email"
+                  id="floatingEmail"
+                  className="form-control"
+                  placeholder="Email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+                <label htmlFor="floatingEmail">Email address</label>
+                <div className="invalid-feedback">Please enter a valid email.</div>
+              </div>
 
-            {/* Password */}
-            <div className="form-floating mb-4">
-              <input
-                type="password"
-                name="password"
-                id="floatingPassword"
-                className="form-control"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
-              <label htmlFor="floatingPassword">Password</label>
-              <div className="invalid-feedback">Please enter a password.</div>
-            </div>
+              {/* Password */}
+              <div className="form-floating mb-4">
+                <input
+                  type="password"
+                  name="password"
+                  id="floatingPassword"
+                  className="form-control"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                />
+                <label htmlFor="floatingPassword">Password</label>
+                <div className="invalid-feedback">Please enter a password.</div>
+              </div>
 
-            <button className="btn btn-login-main w-100" type="submit">
-              Create Account
-            </button>
+              <button className="btn btn-login-main w-100" type="submit">
+                Create Account
+              </button>
 
-            {/* Login link */}
-            <p className="text-center mt-3 mb-0 small">
-              Already have an account?{" "}
-              <a href="/login" className="fw-semibold text-decoration-none">
-                Login
-              </a>
-            </p>
-          </form>
+              <div className="my-3 text-center">
+                <span className="text-muted">or</span>
+              </div>
+
+              <button
+                className="btn btn-outline-secondary w-100"
+                type="button"
+                onClick={handleGoogleLogin}
+              >
+                <img 
+                  src="https://www.google.com/favicon.ico" 
+                  alt="Google" 
+                  style={{ width: "16px", marginRight: "8px" }}
+                />
+                Sign up with Google
+              </button>
+
+              {/* Login link */}
+              <p className="text-center mt-3 mb-0 small">
+                Already have an account?{" "}
+                <a href="/login" className="fw-semibold text-decoration-none">
+                  Login
+                </a>
+              </p>
+            </form>
+          </>
         ) : (
           <form onSubmit={handleVerify}>
             <div className="form-floating mb-3">

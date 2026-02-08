@@ -27,6 +27,8 @@
     "multer-storage-cloudinary": "^4.0.0",
     "node-fetch": "^2.7.0",
     "nodemailer": "^7.0.5",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
     "replicate": "^1.0.1",
     "sib-api-v3-sdk": "^8.5.0",
     "uuid": "^11.1.0"
