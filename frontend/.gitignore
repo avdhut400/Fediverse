@@ -1,7 +1,11 @@
 node_modules
 build
+=======
+# Ignore environment files
+.env
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+>>>>>>> 2f71e4c (Implement Google auth and update configs and updated sign in with google button and entire frontend google auth implementation)
 
-<<<<<<< HEAD
 # dependencies
 /node_modules
 /.pnp
@@ -16,10 +20,6 @@ package-lock.json
 
 # misc
 .DS_Store
-=======
-# Environment variables
-.env
->>>>>>> 8e35a8a484493d79c61015f71e5c44e901f443f0
 .env.local
 .env.development.local
 .env.test.local
@@ -28,6 +28,34 @@ package-lock.json
 # OS files
 .DS_Store
 
+# Logs & coverage
+coverage
+npm-debug.log
+npm-debug.log*
+node_modules
+build
+# Ignore environment files
+.env
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+package-lock.json
+# testing
+/coverage
+# production
+/build
+# misc
+.DS_Store
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+# OS files
+.DS_Store
 # Logs & coverage
 coverage
 npm-debug.log

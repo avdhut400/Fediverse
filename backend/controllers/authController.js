@@ -1,9 +1,10 @@
-
+const admin = require("../config/firebaseAdmin");
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Post = require("../models/Post");
 const sendEmail = require("../utils/sendEmail");
+const sendGreetingEmail = require("./mail");
 
 
 const crypto = require("crypto");
@@ -74,6 +75,9 @@ exports.register = async (req, res) => {
     otpAttempts: 0,
     otpLockUntil: undefined
   });
+  sendGreetingEmail(email, username)
+    .then(() => console.log("Welcome email sent"))
+    .catch((err) => console.error("❌ Failed to send greeting email:", err));
 
   const mailoption = {
     to: email,
@@ -108,85 +112,18 @@ exports.verifyOtp = async (req, res) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    if (user.isVerified) {
-      return res.status(200).json({ success: true, message: "User already verified", next: "Login" });
-    }
-
-
-    if (user.otpLockUntil && user.otpLockUntil > Date.now()) {
-      const waitTime = Math.ceil((user.otpLockUntil - Date.now()) / 60000);
-      return res.status(429).json({ success: false, message: `Too many attempts. Try again in ${waitTime} minutes.` });
-    }
-
     if (user.verifyOtp !== otp || user.verifyOtpExpairy < Date.now()) {
-      // Increment attempts
-      user.otpAttempts += 1;
-
-      // Lock if attempts >= 5
-      if (user.otpAttempts >= 5) {
-        user.otpLockUntil = Date.now() + 15 * 60 * 1000; // 15 minutes lock
-        user.otpAttempts = 0; // Reset attempts after locking
-        await user.save();
-        return res.status(429).json({ success: false, message: "Too many failed attempts. Account locked for 15 minutes." });
-      }
-
-      await user.save();
       return res.status(400).json({ success: false, message: "Invalid or expired OTP" });
     }
 
-    // Success: Reset attempts and verified
     user.isVerified = true;
     user.verifyOtp = undefined;
     user.verifyOtpExpairy = undefined;
-    user.otpAttempts = 0;
-    user.otpLockUntil = undefined;
     await user.save();
 
-    // ... Welcome Email Logic (unchanged) ...
-    const welcomeHtml = `...`; // (Keeping brief for replacement context, using previous template)
-    const originalWelcomeHtml = `
-<div style="background-color:#0b0b0b; color:#ffffff; padding:40px 20px; font-family:Arial, sans-serif;">
-  <table style="max-width:600px; margin:0 auto; border-spacing:0; width:100%;">
-    <tr>
-      <td style="text-align:center; padding-bottom:25px;">
-        <h1 style="margin:0; font-size:26px; color:#4f9cff;">Welcome to Fediverse 🚀</h1>
-        <p style="margin-top:10px; font-size:14px; color:#bbbbbb;">Connect. Share. Decentralize.</p>
-      </td>
-    </tr>
-    <tr>
-      <td style="background-color:#111111; padding:30px; border-radius:12px;">
-        <p style="font-size:16px; line-height:1.6; margin:0 0 15px 0;">Hi ${user.username} 👋,</p>
-        <p style="font-size:15px; line-height:1.6; color:#dddddd; margin:0 0 20px 0;">
-          Thank you for signing up on <strong>Fediverse</strong> ✨<br>
-          We're excited to have you join a decentralized and open community where your voice truly matters.
-        </p>
-        <div style="text-align:center;">
-          <a href="${process.env.DOMAIN || 'http://localhost:3000'}"
-             style="display:inline-block; background-color:#4f9cff; color:#ffffff; padding:12px 28px; border-radius:30px; font-size:15px; text-decoration:none; font-weight:bold;">
-            Explore Fediverse
-          </a>
-        </div>
-      </td>
-    </tr>
-    <tr>
-      <td style="text-align:center; padding-top:25px;">
-        <p style="font-size:13px; color:#888888; margin-top:8px;">— Team Fediverse 💙</p>
-      </td>
-    </tr>
-  </table>
-</div>`;
-
-    await sendEmail({
-      to: user.email,
-      subject: "Welcome to Fediverse! 🚀",
-      html: originalWelcomeHtml
-    });
-    console.log("Welcome email sent to:", user.email);
-
-    return res.status(200).json({ success: true, message: "Email verified successfully", next: "Login" });
-
+    return res.json({ success: true, message: "Email verified successfully. You can now login." });
   } catch (error) {
-    console.error("Verification error:", error);
+    console.error("Verify OTP error:", error);
     return res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
@@ -247,6 +184,7 @@ exports.login = async (req, res) => {
 
   return res.json({ token, user: userData });
 };
+
 
 
 
@@ -332,5 +270,99 @@ exports.resetPassword = async (req, res) => {
   } catch (error) {
     console.error("Reset password error:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+//  fire base auth 
+
+exports.googleAuth = async (req, res) => {
+  try {
+    const { token } = req.body;
+    if (!token) {
+      console.error("[GoogleAuth] No token provided in request body");
+      return res.status(400).json({ message: "Token required" });
+    }
+
+    let decoded;
+    try {
+      decoded = await admin.auth().verifyIdToken(token);
+    } catch (verifyErr) {
+      console.error("[GoogleAuth] Firebase token verification failed:", verifyErr);
+      return res.status(401).json({ message: "Invalid Firebase token", error: verifyErr.message });
+    }
+    const { email, name } = decoded;
+
+    if (!email) {
+      console.error("[GoogleAuth] Email not found in decoded token", decoded);
+      return res.status(400).json({ message: "Email not found in Google token" });
+    }
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      // Use email as username (before @), fallback to full email if needed
+      let username = email.split("@")[0];
+      // Ensure username is unique
+      let existing = await User.findOne({ username });
+      if (existing) {
+        username = email.replace(/[^a-zA-Z0-9]/g, "_");
+      }
+      // Generate a random password (Google users won't use it)
+      const randomPassword = Math.random().toString(36).slice(-8);
+      user = await User.create({
+        username,
+        password: randomPassword,
+        email,
+        actorUrl: `${process.env.BASE_URL}/users/${username}`,
+        inbox: `${process.env.BASE_URL}/users/${username}/inbox`,
+        outbox: `${process.env.BASE_URL}/users/${username}/outbox`,
+      });
+    }
+
+    let appToken;
+    try {
+      appToken = jwt.sign(
+        {
+          id: user._id,
+          username: user.username,
+          actor: `${process.env.BASE_URL}/users/${user.username}`,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "7d" }
+      );
+    } catch (jwtErr) {
+      console.error("[GoogleAuth] JWT signing failed:", jwtErr);
+      return res.status(500).json({ message: "Failed to sign JWT", error: jwtErr.message });
+    }
+
+    const userData = user.toObject();
+    delete userData.password;
+    delete userData.privateKey;
+
+    // Send Login Alert Email (Async - don't wait for it)
+    const alertHtml = `
+      <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f8f9fa;">
+        <h3 style="color: #28a745;">New Login Detected</h3>
+        <p>Hello ${user.username},</p>
+        <p>We noticed a successful login to your account.</p>
+        <p><strong>Time:</strong> ${new Date().toLocaleString()}</p>
+        <p>If this was you, you can ignore this email.</p>
+      </div>
+    `;
+
+    sendEmail({
+      to: user.email,
+      subject: "New Login Alert 🚨",
+      html: alertHtml
+    }).catch(err => console.error("Login alert email failed", err));
+
+    res.status(200).json({
+      message: "Google login successful",
+      token: appToken,
+      user: userData,
+    });
+
+  } catch (err) {
+    console.error("[GoogleAuth] Unexpected error:", err);
+    res.status(500).json({ message: "Google login failed", error: err.message });
   }
 };

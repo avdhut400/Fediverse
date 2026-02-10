@@ -10,6 +10,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
     "@pixelbin/admin": "^4.1.1",
     "@pixelbin/core": "^7.0.0",
@@ -18,7 +21,8 @@
     "cloudinary": "^1.41.3",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
-    "express": "^5.1.0",
+    "express": "^4.22.1",
+    "firebase-admin": "^13.6.1",
     "form-data": "^4.0.4",
     "jsonwebtoken": "^9.0.2",
     "mime-types": "^3.0.1",
