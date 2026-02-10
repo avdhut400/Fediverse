@@ -16,6 +16,7 @@ import LocalUserSearch from "./Pages/LocalUserSearch";
 import ForgotPassword from "./Pages/ForgotPassword";
 import Home from "./Pages/home";
 import Footer from "./components/Footer";
+import Settings from "./Pages/Settings";
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
               path="/users/:username/outbox"
               element={<UserOutboxPage />}
             />
+            <Route path="/settings" element={<Settings />} />
           </Routes>
         </main>
 
