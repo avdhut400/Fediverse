@@ -1,199 +1,180 @@
-# 🌍 PhotoFlux – Fediverse Compatible Photo Sharing Platform
-
-Photoflux is a decentralized, Fediverse-compatible photo sharing social media platform built using the ActivityPub protocol.  
-It allows local and remote users (e.g., Mastodon users) to follow, interact, and exchange posts across federated servers.
-
-This project demonstrates real-world implementation of distributed systems, federation, and open social networking standards.
-
----
-
-## 🔥 Why This Project?
-
-Centralized social networks control user data and content.  
-Photoflux explores the future of decentralized social media using:
-
-- Federation instead of central servers  
-- Open protocols instead of closed APIs  
-- Interoperability across platforms (Mastodon, Pleroma, etc.)
-
----
-
-> ⚠️ **IMPORTANT**
->
-> If you are using **ngrok** for local development, you must run the following command **every time you restart the application**:
->
-> ```bash
-> ngrok http 4000
-> ```
->
-> This is required because ngrok generates a new public URL on each restart, which must be updated in your application configuration (e.g., `BASE_URL`).
+# 🌍 PhotoFlux: Fediverse-Compatible Photo Sharing Platform
 
 
-### Key Features
-## Core Platform
-Secure User Authentication
-. Register and log in with JWT-based authentication for safe and scalable access control.
-Photo Sharing & Management
-. Upload, view, edit, and delete photo posts with ease.
-Social Interaction
-. Follow or unfollow users to build your personalized network.
-Engagement System
-. Like and comment on posts to interact with content and other users.
-Personalized Feed
-. View posts from users you follow in a dynamic and engaging feed.
-User Profiles
-. Access user profiles with their posts, followers, and following details.
+PhotoFlux is a decentralized photo-sharing platform built with ActivityPub.
+It enables local users and remote users (for example, Mastodon accounts) to follow each other and interact across federated servers.
+
+This project showcases practical federation, distributed social networking, and open interoperability standards.
+
+## 🔥 Features
+
+### Core Platform Features
+- Secure user authentication with JWT.
+- Photo upload and post management.
+- Follow/unfollow relationships.
+- Like and comment interactions.
+- Personalized feed based on followed accounts.
+- User profiles with posts, followers, and following data.
 
 ### Fediverse / ActivityPub Features
-- WebFinger implementation  
-- Actor JSON endpoints  
-- Inbox / Outbox handling  
-- Remote Follow support (Mastodon compatible)  
-- HTTP Signatures for secure federation  
-- Accept / Follow activity handling  
-- Public feed via ActivityPub Outbox  
+- WebFinger discovery support.
+- Actor JSON endpoints.
+- Inbox and Outbox handling.
+- Remote follow compatibility.
+- HTTP signatures for federation requests.
+- Follow/Accept activity flow support.
+- Public outbox feed support.
 
----
+## 📦 Setup
 
-## 🛠️ Tech Stack
+### Prerequisites
+- Node.js (recommended: LTS version)
+- npm
+- MongoDB (local or hosted)
+- ngrok (required for remote federation testing)
 
-### Backend
-- Node.js  
-- Express.js  
-- MongoDB  
-- ActivityPub Protocol  
-- HTTP Signatures  
-- JWT Authentication  
-
-### 4. Frontend Setup
-
-- React  
-- Bootstrap  
-- Axios  
-
-### Tools
-- Ngrok (for federation testing)  
-- Postman  
-- Git & GitHub  
-
----
-## ⚙️ Project Architecture
-
-```text
-[React Frontend]
-        |
-     REST + JWT
-        |
-[Express Backend] ---- ActivityPub ----> [Remote Fediverse Servers]
-        |
-     MongoDB
-```
-
-## 📦 Setup Instructions
+> ⚠️ **Important (ngrok users)**
+> Run `ngrok http 4000` every time you restart the backend.
+> Update `BASE_URL` and `DOMAIN` in `backend/.env` after each restart because ngrok generates a new public URL.
 
 ### 1. Clone the Repository
-
 ```bash
 git clone https://github.com/your-username/photoflux.git
 cd photoflux
 ```
-### 2. Backend
+
+### 2. Configure Backend
 ```bash
 cd backend
 npm install
+cp .env.example .env
 ```
-### 3. Create a `.env` file:
 
-```env
-PORT=4000
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_secret
-BASE_URL=https://your-ngrok-url
+Update `backend/.env` with your values:
+- `PORT`
+- `MONGO_URI`
+- `JWT_SECRET`
+- `BASE_URL` (your ngrok public URL if federating)
+- `DOMAIN` (same public domain/ngrok URL)
+- Optional email and cloud storage variables
 
-```
+### 3. Configure Frontend
 ```bash
+cd ../frontend
+npm install
+cp .env.example .env
+```
+
+Set:
+- `REACT_APP_API_URL` (for local: `http://localhost:4000`)
+
+### 4. Start ngrok (Required for Federation)
+Run this every time the backend restarts:
+
+```bash
+ngrok http 4000
+```
+
+Then update `BASE_URL` and `DOMAIN` in `backend/.env` with the new ngrok URL.
+
+### 5. Run the Application
+Open two terminals:
+
+Terminal 1 (backend):
+```bash
+cd backend
 npm start
 ```
-### Frontend
-```bash
 
+Terminal 2 (frontend):
+```bash
 cd frontend
-npm install
-npm run dev
- 
+npm start
 ```
 
----
+## ⚙️ Usage
 
-## 🔐 Security & Key Management
+### Local Usage
+1. Register a new account.
+2. Log in and create photo posts.
+3. Follow users to personalize your feed.
+4. Interact with posts using likes and comments.
 
-This project uses **per-user RSA key pairs** for ActivityPub federation. Each user automatically gets their own unique keypair stored securely in the database during registration.
+### Federation Usage
+1. Ensure backend is publicly accessible via ngrok.
+2. Confirm `BASE_URL` and `DOMAIN` are updated.
+3. Use Mastodon (or another compatible server) to remote-follow a local PhotoFlux user.
+4. Validate Follow/Accept activity flow and outbox visibility.
 
-### Key Features
-- ✅ **Automatic key generation** - No manual setup required
-- ✅ **Database storage** - Keys stored securely in MongoDB
-- ✅ **Per-user isolation** - Each actor has unique keys
-- ✅ **Username validation** - Prevents undefined or empty usernames
-
-### Important Notes
-- **DO NOT** run `genKey.js` - It's deprecated (creates server-wide keys)
-- **DO NOT** use `utils/keys.js` - File-based system is deprecated
-- Keys are automatically managed by the User model
-
-📖 **For detailed information**, see [KEY_MANAGEMENT.md](./KEY_MANAGEMENT.md)
-
----
 ### ActivityPub Endpoints
-WebFinger: /.well-known/webfinger
+- `/.well-known/webfinger`
+- `/users/:username`
+- `/users/:username/inbox`
+- `/users/:username/outbox`
+- `/users/:username/followers`
+- `/users/:username/following`
 
-Actor: /activitypub/users/:username
+## 🛠️ Architecture Overview
 
-Inbox: /activitypub/inbox/:username
+```text
+[React Frontend]
+       |
+    REST + JWT
+       |
+[Express Backend] ---- ActivityPub ----> [Remote Fediverse Servers]
+       |
+    MongoDB
+```
 
-Outbox: /activitypub/outbox/:username
+## 🔐 Security and Key Management
 
-Followers: /activitypub/followers/:username
+PhotoFlux uses per-user RSA key pairs for ActivityPub federation.
+Keys are generated automatically and stored in MongoDB during user registration.
 
-Following: /activitypub/following/:username
+Important notes:
+- Do not run deprecated `genKey.js`.
+- Do not use deprecated `utils/keys.js`.
+- Key lifecycle is managed by the user model.
 
----
-### Tested With
+For details, see [KEY_MANAGEMENT.md](./KEY_MANAGEMENT.md).
 
-Mastodon remote follow
+## 🧰 Tech Stack
 
-Remote Accept / Follow flow
+### Backend
+- Node.js
+- Express.js
+- MongoDB
+- ActivityPub
+- HTTP Signatures
+- JWT Authentication
 
-Public Outbox feed
----
+### Frontend
+- React
+- Bootstrap
+- Axios
 
-### Future Enhancements
+### Tools
+- ngrok
+- Postman
+- Git/GitHub
 
-Full remote post ingestion into local feed
+## 📖 Additional Documentation
 
-ActivityPub Like & Announce activities
+- [API_Docs.md](./API_Docs.md)
+- [CONTRIBUTING.md](./CONTRIBUTING.md)
+- [KEY_MANAGEMENT.md](./KEY_MANAGEMENT.md)
 
-Media federation improvements
+## 🚀 Future Enhancements
+- Remote post ingestion into local feed.
+- ActivityPub Like and Announce support.
+- Improved media federation.
+- Moderation and reporting tools.
+- Scalable inbox queue processing.
 
-Moderation & reporting system
+## 📄 License
 
-Scalable inbox queue processing
- 
----
-### Contributing
-
-Contributions are welcome!!
-
-Please read CONTRIBUTING.md before submitting pull requests.
- 
----
-
-### License
 This project is licensed under the MIT License.
 
----
-
-### Author
+## 👤 Author
 
 Avdhut Magar
-
----
