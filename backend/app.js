@@ -4,10 +4,18 @@ const fetch = require("node-fetch");
 const express = require('express');
 const cors = require('cors');
 const app = express();
+app.use(cors({
+  origin: "http://localhost:3000" || process.env.FRONTEND_URL,
+  credentials: true // optional: if using cookies
+}));
+
 // app.use(cors({
-//   origin: "http://localhost:3000" || process.env.FRONTEND_URL,
+//   origin:process.env.FRONTEND_URL|| "http://localhost:3000",
 //   credentials: true // optional: if using cookies
 // }));
+
+
+
 // app.use(cors({
 //   origin: process.env.FRONTEND_URL || "http://localhost:3000",
 //   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -38,45 +46,45 @@ const app = express();
 // );
 
 
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://fediverse-rho.vercel.app",
-];
+// const allowedOrigins = [
+//   "http://localhost:3000",
+//   "https://fediverse-rho.vercel.app",
+// ];
 
-const corsOptions = {
-  origin: (origin, callback) => {
-    // Postman/server-to-server requests मध्ये origin नसतो
-    if (!origin) {
-      return callback(null, true);
-    }
+// const corsOptions = {
+//   origin: (origin, callback) => {
+//     // Postman/server-to-server requests मध्ये origin नसतो
+//     if (!origin) {
+//       return callback(null, true);
+//     }
 
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
+//     if (allowedOrigins.includes(origin)) {
+//       return callback(null, true);
+//     }
 
-    console.log("Blocked CORS origin:", origin);
-    return callback(new Error("Not allowed by CORS"));
-  },
+//     console.log("Blocked CORS origin:", origin);
+//     return callback(new Error("Not allowed by CORS"));
+//   },
 
-  methods: [
-    "GET",
-    "POST",
-    "PUT",
-    "PATCH",
-    "DELETE",
-    "OPTIONS",
-  ],
+//   methods: [
+//     "GET",
+//     "POST",
+//     "PUT",
+//     "PATCH",
+//     "DELETE",
+//     "OPTIONS",
+//   ],
 
-  allowedHeaders: [
-    "Content-Type",
-    "Authorization",
-    "Accept",
-    "ngrok-skip-browser-warning",
-  ],
+//   allowedHeaders: [
+//     "Content-Type",
+//     "Authorization",
+//     "Accept",
+//     "ngrok-skip-browser-warning",
+//   ],
 
-  credentials: true,
-  optionsSuccessStatus: 204,
-};
+//   credentials: true,
+//   optionsSuccessStatus: 204,
+// };
 
 
 const replyRoutes = require("./routes/replyRoutes");
