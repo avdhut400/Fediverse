@@ -4,38 +4,38 @@ const fetch = require("node-fetch");
 const express = require('express');
 const cors = require('cors');
 const app = express();
-// app.use(cors({
-//   origin: "http://localhost:3000",
-//   credentials: true // optional: if using cookies
-// }));
+app.use(cors({
+  origin: "http://localhost:3000" || process.env.FRONTEND_URL,
+  credentials: true // optional: if using cookies
+}));
 // app.use(cors({
 //   origin: process.env.FRONTEND_URL || "http://localhost:3000",
 //   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
 //   allowedHeaders: ["Content-Type", "Authorization"],
 //   credentials: true
 // }));
-app.use(
-  cors({
-    origin:
-      process.env.FRONTEND_URL ||
-      "http://localhost:3000",
-    methods: [
-      "GET",
-      "POST",
-      "PUT",
-      "PATCH",
-      "DELETE",
-      "OPTIONS",
-    ],
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-      "Accept",
-      "ngrok-skip-browser-warning",
-    ],
-    credentials: true,
-  })
-);
+// app.use(
+//   cors({
+//     origin:
+//       process.env.FRONTEND_URL ||
+//       "http://localhost:3000",
+//     methods: [
+//       "GET",
+//       "POST",
+//       "PUT",
+//       "PATCH",
+//       "DELETE",
+//       "OPTIONS",
+//     ],
+//     allowedHeaders: [
+//       "Content-Type",
+//       "Authorization",
+//       "Accept",
+//       "ngrok-skip-browser-warning",
+//     ],
+//     credentials: true,
+//   })
+// );
 
 
 
