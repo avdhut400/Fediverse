@@ -1,87 +1,136 @@
 import React from "react";
-import img from "./1.jpg"
+import img from "./1.jpg";
+
 function Footer() {
+  const linkStyle = {
+    background: "none",
+    border: "none",
+    padding: 0,
+    color: "#0d6efd",
+    cursor: "pointer",
+    textDecoration: "underline",
+  };
+
   return (
     <footer style={{ backgroundColor: "rgba(6, 6, 6, 1)" }}>
       <div className="container border-top mt-5">
         <div className="row mt-5">
           <div className="col">
-            <img src={img} style={{ width: "100%" }} className="rounded-circle"/>
-            <p style={{color:"white"}}>
-              &copy; 2023 - 2025, PhotoFlux Ltd. All rights reserved.
+            <img
+              src={img}
+              alt="PhotoFlux logo"
+              style={{ width: "100%" }}
+              className="rounded-circle"
+            />
+
+            <p style={{ color: "white" }}>
+              &copy; 2023 - 2026, PhotoFlux Ltd. All rights reserved.
             </p>
           </div>
+
           <div className="col">
-            <p style={{color:"white"}}>Company</p>
-            <a href="#">About</a>
+            <p style={{ color: "white" }}>Company</p>
+
+            <button type="button" style={linkStyle}>About</button>
             <br />
-            <a href="#">Products</a>
+
+            <button type="button" style={linkStyle}>Products</button>
             <br />
-            <a href="#">Pricing</a>
+
+            <button type="button" style={linkStyle}>Pricing</button>
             <br />
-            <a href="#">Referral programme</a>
+
+            <button type="button" style={linkStyle}>
+              Referral programme
+            </button>
             <br />
-            <a href="#">Careers</a>
+
+            <button type="button" style={linkStyle}>Careers</button>
             <br />
-            <a href="#">PhotoFlux.tech</a>
+
+            <button type="button" style={linkStyle}>PhotoFlux.tech</button>
             <br />
-            <a href="#">Press & media</a>
+
+            <button type="button" style={linkStyle}>Press & media</button>
             <br />
-            <a href="#">photoFlux cares (CSR)</a>
-            <br />
+
+            <button type="button" style={linkStyle}>
+              PhotoFlux cares (CSR)
+            </button>
           </div>
+
           <div className="col">
-            <p style={{color:"white"}}>Support</p>
-            <a href="#">Contact</a>
+            <p style={{ color: "white" }}>Support</p>
+
+            <a href="mailto:support@photoflux.social">Contact</a>
             <br />
-            <a href="#">Support portal</a>
+
+            <button type="button" style={linkStyle}>Support portal</button>
             <br />
-            <a href="#">Flux-Connect blog</a>
+
+            <button type="button" style={linkStyle}>
+              Flux-Connect blog
+            </button>
             <br />
-            <a href="#">List of charges</a>
+
+            <button type="button" style={linkStyle}>
+              List of charges
+            </button>
             <br />
-            <a href="#">Downloads & resources</a>
-            <br />
+
+            <button type="button" style={linkStyle}>
+              Downloads & resources
+            </button>
           </div>
+
           <div className="col">
-            <p style={{color:"white"}}>Account</p>
-            <a href="#">Open an account</a>
+            <p style={{ color: "white" }}>Account</p>
+
+            <button type="button" style={linkStyle}>
+              Open an account
+            </button>
             <br />
-            <a href="#">Fund transfer</a>
+
+            <button type="button" style={linkStyle}>
+              Fund transfer
+            </button>
             <br />
-            <a href="#">60 day challenge</a>
-            <br />
+
+            <button type="button" style={linkStyle}>
+              60 day challenge
+            </button>
           </div>
         </div>
+
         <div className="mt-5 text-muted" style={{ fontSize: "14px" }}>
-          <p style={{color:"white"}}>
-            Photoflux: A federated photo-sharing platform powered by ActivityPub protocol.  
-            Hosting and federation services may vary based on your instance administrator's policies.  
-            All user content is decentralized and managed independently by each server.
-            Registered Address: Photoflux HQ, Open Source Commons, Bengaluru - 560078, Karnataka, India.
-            For any issues or takedown requests, please contact: support@photoflux.social.
-            Please ensure you review the Fediverse Guidelines and our Community Code of Conduct.
+          <p style={{ color: "white" }}>
+            Photoflux is a federated photo-sharing platform powered by the
+            ActivityPub protocol. Hosting and federation services may vary
+            based on the policies of each instance administrator. User content
+            is decentralized and managed independently by each server.
+            Registered Address: Photoflux HQ, Open Source Commons, Bengaluru -
+            560078, Karnataka, India. For issues or takedown requests, contact
+            support@photoflux.social.
           </p>
 
-          <p style={{color:"white"}}>
-            Procedure to report a violation or abuse on Photoflux: Use the "Report" button on any post or profile.  
-            Mandatory details for submitting reports: Username, reason for report, and any supporting evidence.  
-            Benefits: Transparent moderation, user-driven governance, and quicker issue resolution through your home instance admin.
+          <p style={{ color: "white" }}>
+            To report abuse or a violation, use the Report button on the
+            relevant post or profile. Include the username, reason for the
+            report and supporting evidence.
           </p>
 
-          <p style={{color:"white"}}>
-            Content shared on Photoflux reflects the views of individual users;
-            always verify before relying on any shared information.
+          <p style={{ color: "white" }}>
+            Content shared on Photoflux reflects the views of individual users.
+            Always verify information before relying on it.
           </p>
 
-          <p style={{color:"white"}}>
-            "Prevent unauthorized access to your Photoflux account. Always keep your login credentials secure and do not share your password with anyone. Be cautious when accessing third-party Fediverse instances or applications claiming to be associated with Photoflux.
-             Official communication will only occur through trusted channels.Please ensure that your email and profile settings are up to date to receive important notifications regarding your posts, follows, and interactions. Photoflux is part of the decentralized Fediverse — 
-             a network where each server (or instance) operates independently. Always verify the trustworthiness of external servers before following or interacting with remote users.
-             Photoflux does not solicit payments, offer financial advice, or authorize anyone to act on our behalf for paid services. If you come across users or websites offering premium access, features, or monetized services using our name, report them via our support page immediately.
-             As part of our content safety policy, all posts undergo automated moderation for NSFW or harmful content. If your post violates community guidelines, it may be hidden or removed without prior notice. Content flagged as inappropriate will not be visible in the public feed
-             or discoverable via search.We are committed to an open and respectful social network where user safety and freedom coexist. If you encounter abusive content or behavior, please use the report feature or contact us at support@photoflux.app. Your privacy and safety are our top priorities.
-             By using Photoflux, you agree to follow community guidelines and abide by our terms of use. We reserve the right to suspend or restrict access to users violating our trust policies."
+          <p style={{ color: "white" }}>
+            Keep your login credentials secure and never share your password.
+            Be cautious when accessing third-party Fediverse instances.
+            Photoflux does not solicit payments or offer financial advice.
+            Content that violates community guidelines may be hidden or
+            removed. By using Photoflux, you agree to follow the community
+            guidelines and terms of use.
           </p>
         </div>
       </div>
