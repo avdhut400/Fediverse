@@ -13,43 +13,43 @@ function Footer() {
           </div>
           <div className="col">
             <p style={{color:"white"}}>Company</p>
-            <a href="">About</a>
+            <a href="#">About</a>
             <br />
-            <a href="">Products</a>
+            <a href="#">Products</a>
             <br />
-            <a href="">Pricing</a>
+            <a href="#">Pricing</a>
             <br />
-            <a href="">Referral programme</a>
+            <a href="#">Referral programme</a>
             <br />
-            <a href="">Careers</a>
+            <a href="#">Careers</a>
             <br />
-            <a href="">PhotoFlux.tech</a>
+            <a href="#">PhotoFlux.tech</a>
             <br />
-            <a href="">Press & media</a>
+            <a href="#">Press & media</a>
             <br />
-            <a href="">photoFlux cares (CSR)</a>
+            <a href="#">photoFlux cares (CSR)</a>
             <br />
           </div>
           <div className="col">
             <p style={{color:"white"}}>Support</p>
-            <a href="">Contact</a>
+            <a href="#">Contact</a>
             <br />
-            <a href="">Support portal</a>
+            <a href="#">Support portal</a>
             <br />
-            <a href="">Flux-Connect blog</a>
+            <a href="#">Flux-Connect blog</a>
             <br />
-            <a href="">List of charges</a>
+            <a href="#">List of charges</a>
             <br />
-            <a href="">Downloads & resources</a>
+            <a href="#">Downloads & resources</a>
             <br />
           </div>
           <div className="col">
             <p style={{color:"white"}}>Account</p>
-            <a href="">Open an account</a>
+            <a href="#">Open an account</a>
             <br />
-            <a href="">Fund transfer</a>
+            <a href="#">Fund transfer</a>
             <br />
-            <a href="">60 day challenge</a>
+            <a href="#">60 day challenge</a>
             <br />
           </div>
         </div>
