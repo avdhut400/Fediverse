@@ -112,7 +112,7 @@ const sendGreetingEmail = async (toEmail, userName = "") => {
     },
   });
 
-  // Gmail connection आणि credentials check
+  
   await transporter.verify();
 
   const mailOptions = {
