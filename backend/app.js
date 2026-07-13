@@ -4,15 +4,22 @@ const fetch = require("node-fetch");
 const express = require('express');
 const cors = require('cors');
 const app = express();
-app.use(cors({
-  origin: "http://localhost:3000" || process.env.FRONTEND_URL,
-  credentials: true // optional: if using cookies
-}));
-
 // app.use(cors({
-//   origin:process.env.FRONTEND_URL|| "http://localhost:3000",
+//   origin: "http://localhost:3000" || process.env.FRONTEND_URL,
 //   credentials: true // optional: if using cookies
 // }));
+
+const allowedOrigins = [
+  "http://localhost:3000",
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
+);
 
 
 
