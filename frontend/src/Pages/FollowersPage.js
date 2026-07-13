@@ -1,5 +1,1211 @@
 
+// import React, {
+//   useEffect,
+//   useMemo,
+//   useRef,
+//   useState,
+// } from "react";
+// import axios from "axios";
+// import { useParams } from "react-router-dom";
+// import { jwtDecode } from "jwt-decode";
+
+// import {
+//   FaCamera,
+//   FaExternalLinkAlt,
+//   FaTimes,
+//   FaTrashAlt,
+//   FaUpload,
+//   FaUserFriends,
+//   FaUserMinus,
+// } from "react-icons/fa";
+
+// import "./FollowersPage.css";
+
+// const FollowersPage = () => {
+//   const { username } = useParams();
+
+//   const [view, setView] = useState("followers");
+
+//   const [followers, setFollowers] = useState([]);
+//   const [following, setFollowing] = useState([]);
+
+//   const [currentUsername, setCurrentUsername] =
+//     useState("");
+
+//   const [profilePic, setProfilePic] = useState("");
+
+//   const [loading, setLoading] = useState(true);
+//   const [actionUser, setActionUser] = useState("");
+//   const [error, setError] = useState("");
+
+//   const [profileModalOpen, setProfileModalOpen] =
+//     useState(false);
+
+//   const [
+//     selectedProfileFile,
+//     setSelectedProfileFile,
+//   ] = useState(null);
+
+//   const [profilePreview, setProfilePreview] =
+//     useState("");
+
+//   const [profileUploading, setProfileUploading] =
+//     useState(false);
+
+//   const [profileMessage, setProfileMessage] =
+//     useState("");
+
+//   const profileInputRef = useRef(null);
+
+//   const apiUrl = process.env.REACT_APP_API_URL;
+//   const token = localStorage.getItem("token");
+
+//   const headers = useMemo(
+//     () => ({
+//       Authorization: token
+//         ? `Bearer ${token}`
+//         : "",
+
+//       Accept: "application/activity+json",
+
+//       "ngrok-skip-browser-warning": "true",
+//     }),
+//     [token]
+//   );
+
+  
+//   const addCacheBuster = (url) => {
+//     if (!url) return "";
+
+//     const cleanUrl = String(url)
+//       .replace(
+//         /([?&])v=\d+(&|$)/,
+//         "$1"
+//       )
+//       .replace(/[?&]$/, "");
+
+//     const separator = cleanUrl.includes("?")
+//       ? "&"
+//       : "?";
+
+//     return `${cleanUrl}${separator}v=${Date.now()}`;
+//   };
+
+  
+//   const getProfilePictureUrl = (data) => {
+//     return (
+//       data?.profilePic?.url ||
+//       data?.user?.profilePic?.url ||
+//       data?.user?.profilePic ||
+//       data?.profilePic ||
+//       data?.icon?.url ||
+//       ""
+//     );
+//   };
+
+  
+//   useEffect(() => {
+//     try {
+//       if (token) {
+//         const decoded = jwtDecode(token);
+
+//         setCurrentUsername(
+//           decoded.username ||
+//             localStorage.getItem("username") ||
+//             ""
+//         );
+//       } else {
+//         setCurrentUsername(
+//           localStorage.getItem("username") || ""
+//         );
+//       }
+//     } catch (decodeError) {
+//       console.error(
+//         "Token decode error:",
+//         decodeError
+//       );
+
+//       setCurrentUsername(
+//         localStorage.getItem("username") || ""
+//       );
+//     }
+//   }, [token]);
+
+  
+//   useEffect(() => {
+//     return () => {
+//       if (profilePreview) {
+//         URL.revokeObjectURL(profilePreview);
+//       }
+//     };
+//   }, [profilePreview]);
+
+//   const cleanProfileUrl = (item) => {
+//     if (!item) return "";
+
+//     const rawUrl =
+//       typeof item === "string"
+//         ? item
+//         : item.id ||
+//           item.url ||
+//           item.href ||
+//           item.actor ||
+//           "";
+
+//     if (!rawUrl) return "";
+
+//     try {
+//       const parsed = new URL(rawUrl);
+
+//       return `${parsed.protocol}//${parsed.host}${parsed.pathname}`.replace(
+//         /\/+$/,
+//         ""
+//       );
+//     } catch {
+//       return String(rawUrl).replace(
+//         /\/+$/,
+//         ""
+//       );
+//     }
+//   };
+
+//   const getUsernameFromUrl = (profileUrl) => {
+//     if (!profileUrl) return "user";
+
+//     try {
+//       const parsed = new URL(profileUrl);
+
+//       const parts = parsed.pathname
+//         .split("/")
+//         .filter(Boolean);
+
+//       return (
+//         parts[parts.length - 1]
+//           ?.replace(/^@/, "") || "user"
+//       );
+//     } catch {
+//       const parts = String(profileUrl)
+//         .split("/")
+//         .filter(Boolean);
+
+//       return (
+//         parts[parts.length - 1]
+//           ?.replace(/^@/, "") || "user"
+//       );
+//     }
+//   };
+
+//   const normalizeUserItem = (item) => {
+//     const profileUrl =
+//       cleanProfileUrl(item);
+
+//     const isObject =
+//       typeof item === "object" &&
+//       item !== null;
+
+//     const normalizedUsername = isObject
+//       ? item.preferredUsername ||
+//         item.username ||
+//         getUsernameFromUrl(profileUrl)
+//       : getUsernameFromUrl(profileUrl);
+
+//     const displayName = isObject
+//       ? item.name ||
+//         item.displayName ||
+//         normalizedUsername
+//       : normalizedUsername;
+
+//     const avatar = isObject
+//       ? item.icon?.url ||
+//         item.avatar?.url ||
+//         item.avatar ||
+//         item.profilePic?.url ||
+//         item.profilePic ||
+//         ""
+//       : "";
+
+//     let domain = "";
+
+//     try {
+//       domain = profileUrl
+//         ? new URL(profileUrl).hostname
+//         : "";
+//     } catch {
+//       domain = "";
+//     }
+
+//     return {
+//       username: normalizedUsername,
+//       displayName,
+//       profileUrl,
+//       avatar,
+//       domain,
+//     };
+//   };
+
+//   /*
+//    * Duplicate followers/following remove.
+//    */
+//   const processCollection = (data) => {
+//     let items = [];
+
+//     if (Array.isArray(data)) {
+//       items = data;
+//     } else if (
+//       Array.isArray(data?.orderedItems)
+//     ) {
+//       items = data.orderedItems;
+//     } else if (
+//       Array.isArray(
+//         data?.first?.orderedItems
+//       )
+//     ) {
+//       items = data.first.orderedItems;
+//     } else if (
+//       Array.isArray(data?.items)
+//     ) {
+//       items = data.items;
+//     }
+
+//     const uniqueMap = new Map();
+
+//     items
+//       .map(normalizeUserItem)
+//       .forEach((user) => {
+//         const uniqueKey =
+//           user.profileUrl
+//             ?.toLowerCase()
+//             .replace(/\/+$/, "") ||
+//           `${user.username?.toLowerCase()}@${user.domain?.toLowerCase()}`;
+
+//         if (
+//           uniqueKey &&
+//           !uniqueMap.has(uniqueKey)
+//         ) {
+//           uniqueMap.set(
+//             uniqueKey,
+//             user
+//           );
+//         }
+//       });
+
+//     return Array.from(
+//       uniqueMap.values()
+//     );
+//   };
+
+  
+//   const fetchProfilePicture = async () => {
+//     if (!username || !apiUrl) return;
+
+//     const loggedUsername =
+//       localStorage.getItem("username") ||
+//       "";
+
+//     try {
+//       let response;
+
+    
+//       if (
+//         token &&
+//         loggedUsername === username
+//       ) {
+//         response = await axios.get(
+//           `${apiUrl}/api/users/me`,
+//           {
+//             headers: {
+//               Authorization:
+//                 `Bearer ${token}`,
+
+//               "ngrok-skip-browser-warning":
+//                 "true",
+//             },
+//           }
+//         );
+//       } else {
+//         /*
+//          * दुसऱ्या user साठी actor endpoint.
+//          */
+//         response = await axios.get(
+//           `${apiUrl}/users/${username}`,
+//           {
+//             headers: {
+//               Accept:
+//                 "application/activity+json",
+
+//               "ngrok-skip-browser-warning":
+//                 "true",
+//             },
+//           }
+//         );
+//       }
+
+//       const permanentUrl =
+//         getProfilePictureUrl(
+//           response.data
+//         );
+
+//       if (permanentUrl) {
+//         setProfilePic(
+//           addCacheBuster(permanentUrl)
+//         );
+
+//         if (
+//           loggedUsername === username
+//         ) {
+//           localStorage.setItem(
+//             "profilePic",
+//             permanentUrl
+//           );
+//         }
+//       } else {
+//         setProfilePic("");
+//       }
+//     } catch (requestError) {
+//       console.error(
+//         "Profile picture fetch failed:",
+//         requestError.response?.data ||
+//           requestError.message
+//       );
+
+      
+//       if (
+//         loggedUsername === username
+//       ) {
+//         const storedProfilePic =
+//           localStorage.getItem(
+//             "profilePic"
+//           );
+
+//         setProfilePic(
+//           storedProfilePic
+//             ? addCacheBuster(
+//                 storedProfilePic
+//               )
+//             : ""
+//         );
+//       }
+//     }
+//   };
+
+//   /*
+//    * Followers आणि following fetch.
+//    */
+//   const fetchData = async () => {
+//     if (!username || !apiUrl) {
+//       setError(
+//         "Username or API URL is missing."
+//       );
+
+//       setLoading(false);
+//       return;
+//     }
+
+//     try {
+//       setLoading(true);
+//       setError("");
+
+//       const [
+//         followersResponse,
+//         followingResponse,
+//       ] = await Promise.all([
+//         axios.get(
+//           `${apiUrl}/users/${username}/followers`,
+//           {
+//             headers,
+//           }
+//         ),
+
+//         axios.get(
+//           `${apiUrl}/users/${username}/following`,
+//           {
+//             headers,
+//           }
+//         ),
+//       ]);
+
+//       setFollowers(
+//         processCollection(
+//           followersResponse.data
+//         )
+//       );
+
+//       setFollowing(
+//         processCollection(
+//           followingResponse.data
+//         )
+//       );
+//     } catch (requestError) {
+//       console.error(
+//         "Failed to load connections:",
+//         requestError.response?.data ||
+//           requestError.message
+//       );
+
+//       setError(
+//         requestError.response?.data
+//           ?.message ||
+//           "Failed to load followers and following."
+//       );
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+  
+//   useEffect(() => {
+//     fetchData();
+//     fetchProfilePicture();
+
+    
+//   }, [username, apiUrl, token]);
+
+//   const removeFollower = async (
+//     targetUsername
+//   ) => {
+//     if (
+//       !targetUsername ||
+//       actionUser
+//     ) {
+//       return;
+//     }
+
+//     const confirmed = window.confirm(
+//       `Remove @${targetUsername} from your followers?`
+//     );
+
+//     if (!confirmed) return;
+
+//     try {
+//       setActionUser(
+//         `remove-${targetUsername}`
+//       );
+
+//       setError("");
+
+//       await axios.delete(
+//         `${apiUrl}/users/${username}/followers/${targetUsername}`,
+//         {
+//           headers,
+//         }
+//       );
+
+//       setFollowers((current) =>
+//         current.filter(
+//           (user) =>
+//             user.username !==
+//             targetUsername
+//         )
+//       );
+//     } catch (requestError) {
+//       setError(
+//         requestError.response?.data
+//           ?.message ||
+//           `Could not remove @${targetUsername}.`
+//       );
+//     } finally {
+//       setActionUser("");
+//     }
+//   };
+
+//   const unfollowUser = async (
+//     targetUsername
+//   ) => {
+//     if (
+//       !targetUsername ||
+//       actionUser
+//     ) {
+//       return;
+//     }
+
+//     const confirmed = window.confirm(
+//       `Unfollow @${targetUsername}?`
+//     );
+
+//     if (!confirmed) return;
+
+//     try {
+//       setActionUser(
+//         `unfollow-${targetUsername}`
+//       );
+
+//       setError("");
+
+//       await axios.delete(
+//         `${apiUrl}/users/${username}/following/${targetUsername}`,
+//         {
+//           headers,
+//         }
+//       );
+
+//       setFollowing((current) =>
+//         current.filter(
+//           (user) =>
+//             user.username !==
+//             targetUsername
+//         )
+//       );
+//     } catch (requestError) {
+//       setError(
+//         requestError.response?.data
+//           ?.message ||
+//           `Could not unfollow @${targetUsername}.`
+//       );
+//     } finally {
+//       setActionUser("");
+//     }
+//   };
+
+//   const handleProfileFileSelect = (
+//     event
+//   ) => {
+//     const file =
+//       event.target.files?.[0];
+
+//     if (!file) return;
+
+//     const allowedTypes = [
+//       "image/jpeg",
+//       "image/jpg",
+//       "image/png",
+//       "image/webp",
+//     ];
+
+//     if (
+//       !allowedTypes.includes(file.type)
+//     ) {
+//       setProfileMessage(
+//         "Only JPG, PNG and WEBP images are allowed."
+//       );
+
+//       event.target.value = "";
+//       return;
+//     }
+
+//     if (
+//       file.size >
+//       5 * 1024 * 1024
+//     ) {
+//       setProfileMessage(
+//         "Profile picture must be less than 5 MB."
+//       );
+
+//       event.target.value = "";
+//       return;
+//     }
+
+//     if (profilePreview) {
+//       URL.revokeObjectURL(
+//         profilePreview
+//       );
+//     }
+
+//     setSelectedProfileFile(file);
+
+//     setProfilePreview(
+//       URL.createObjectURL(file)
+//     );
+
+//     setProfileMessage("");
+//     setProfileModalOpen(true);
+
+//     event.target.value = "";
+//   };
+
+//   const resetProfileModal = () => {
+//     if (profilePreview) {
+//       URL.revokeObjectURL(
+//         profilePreview
+//       );
+//     }
+
+//     setProfileModalOpen(false);
+//     setSelectedProfileFile(null);
+//     setProfilePreview("");
+//     setProfileMessage("");
+//   };
+
+//   const closeProfileModal = () => {
+//     if (profileUploading) return;
+
+//     resetProfileModal();
+//   };
+
+//   /*
+//    * Profile picture upload.
+//    */
+//   const uploadProfilePicture =
+//     async () => {
+//       if (!selectedProfileFile) {
+//         setProfileMessage(
+//           "Please select a profile picture."
+//         );
+
+//         return;
+//       }
+
+//       const formData =
+//         new FormData();
+
+//       formData.append(
+//         "profilePic",
+//         selectedProfileFile
+//       );
+
+//       try {
+//         setProfileUploading(true);
+//         setProfileMessage("");
+
+//         const response =
+//           await axios.put(
+//             `${apiUrl}/api/users/me/profile-picture`,
+//             formData,
+//             {
+//               headers: {
+//                 Authorization:
+//                   `Bearer ${token}`,
+
+//                 "ngrok-skip-browser-warning":
+//                   "true",
+//               },
+//             }
+//           );
+
+//         const permanentUrl =
+//           getProfilePictureUrl(
+//             response.data
+//           );
+
+       
+//         if (!permanentUrl) {
+//           throw new Error(
+//             "Backend did not return profile picture URL."
+//           );
+//         }
+
+        
+//         setProfilePic(
+//           addCacheBuster(
+//             permanentUrl
+//           )
+//         );
+
+//         localStorage.setItem(
+//           "profilePic",
+//           permanentUrl
+//         );
+
+        
+//         window.dispatchEvent(
+//           new CustomEvent(
+//             "profile-picture-updated",
+//             {
+//               detail: permanentUrl,
+//             }
+//           )
+//         );
+
+//         setProfileMessage(
+//           "Profile picture updated successfully."
+//         );
+
+//         window.setTimeout(() => {
+//           resetProfileModal();
+
+          
+//           fetchProfilePicture();
+//         }, 700);
+//       } catch (requestError) {
+//         console.error(
+//           "Profile picture update failed:",
+//           requestError.response?.data ||
+//             requestError.message
+//         );
+
+//         setProfileMessage(
+//           requestError.response?.data
+//             ?.message ||
+//             requestError.message ||
+//             "Failed to update profile picture."
+//         );
+//       } finally {
+//         setProfileUploading(false);
+//       }
+//     };
+
+//   const isOwnProfile =
+//     Boolean(currentUsername) &&
+//     currentUsername === username;
+
+//   const displayedUsers =
+//     view === "followers"
+//       ? followers
+//       : following;
+
+//   const getInitial = (value) =>
+//     value
+//       ?.trim()
+//       ?.charAt(0)
+//       ?.toUpperCase() || "U";
+
+//   return (
+//     <main className="connections-page">
+//       <section className="connections-container">
+//         <header className="connections-profile-card">
+//           <div
+//             className={`connections-profile-avatar ${
+//               isOwnProfile
+//                 ? "connections-profile-avatar-editable"
+//                 : ""
+//             }`}
+//             onClick={() => {
+//               if (
+//                 isOwnProfile &&
+//                 !profileUploading
+//               ) {
+//                 profileInputRef.current?.click();
+//               }
+//             }}
+//           >
+//             {profilePic ? (
+//               <img
+//                 src={profilePic}
+//                 alt={`${username} profile`}
+//                 onError={() => {
+//                   const storedProfilePic =
+//                     localStorage.getItem(
+//                       "profilePic"
+//                     );
+
+//                   if (
+//                     storedProfilePic
+//                   ) {
+//                     setProfilePic(
+//                       addCacheBuster(
+//                         storedProfilePic
+//                       )
+//                     );
+//                   } else {
+//                     setProfilePic("");
+//                   }
+//                 }}
+//               />
+//             ) : (
+//               <span>
+//                 {getInitial(username)}
+//               </span>
+//             )}
+
+//             {isOwnProfile && (
+//               <div className="connections-profile-camera">
+//                 <FaCamera />
+//               </div>
+//             )}
+//           </div>
+
+//           {isOwnProfile && (
+//             <input
+//               ref={profileInputRef}
+//               type="file"
+//               accept="image/jpeg,image/jpg,image/png,image/webp"
+//               onChange={
+//                 handleProfileFileSelect
+//               }
+//               hidden
+//             />
+//           )}
+
+//           <div className="connections-profile-info">
+//             <p className="connections-label">
+//               PHOTOFLUX CONNECTIONS
+//             </p>
+
+//             <h1>@{username}</h1>
+
+//             <p>
+//               View followers and following
+//               from the local network and the
+//               Fediverse.
+//             </p>
+//           </div>
+
+//           <div className="connections-stats">
+//             <div>
+//               <strong>
+//                 {followers.length}
+//               </strong>
+
+//               <span>Followers</span>
+//             </div>
+
+//             <div>
+//               <strong>
+//                 {following.length}
+//               </strong>
+
+//               <span>Following</span>
+//             </div>
+//           </div>
+//         </header>
+
+//         <div className="connections-tabs">
+//           <button
+//             type="button"
+//             className={
+//               view === "followers"
+//                 ? "active"
+//                 : ""
+//             }
+//             onClick={() =>
+//               setView("followers")
+//             }
+//           >
+//             Followers
+//             <span>
+//               {followers.length}
+//             </span>
+//           </button>
+
+//           <button
+//             type="button"
+//             className={
+//               view === "following"
+//                 ? "active"
+//                 : ""
+//             }
+//             onClick={() =>
+//               setView("following")
+//             }
+//           >
+//             Following
+//             <span>
+//               {following.length}
+//             </span>
+//           </button>
+//         </div>
+
+//         {error && (
+//           <div className="connections-error">
+//             <span>!</span>
+
+//             <p>{error}</p>
+
+//             <button
+//               type="button"
+//               onClick={fetchData}
+//             >
+//               Retry
+//             </button>
+//           </div>
+//         )}
+
+//         <section className="connections-list-card">
+//           <div className="connections-list-header">
+//             <div>
+//               <h2>
+//                 {view === "followers"
+//                   ? "Followers"
+//                   : "Following"}
+//               </h2>
+
+//               <p>
+//                 {displayedUsers.length}{" "}
+//                 connections
+//               </p>
+//             </div>
+
+//             <FaUserFriends />
+//           </div>
+
+//           {loading ? (
+//             <div className="connections-loading">
+//               <div className="connections-spinner" />
+//               <p>Loading...</p>
+//             </div>
+//           ) : displayedUsers.length ===
+//             0 ? (
+//             <div className="connections-empty">
+//               <div className="connections-empty-icon">
+//                 <FaUserFriends />
+//               </div>
+
+//               <h3>
+//                 {view === "followers"
+//                   ? "No followers yet"
+//                   : "Not following anyone"}
+//               </h3>
+//             </div>
+//           ) : (
+//             <div className="connections-list">
+//               {displayedUsers.map(
+//                 (
+//                   connectionUser,
+//                   index
+//                 ) => {
+//                   const removeLoading =
+//                     actionUser ===
+//                     `remove-${connectionUser.username}`;
+
+//                   const unfollowLoading =
+//                     actionUser ===
+//                     `unfollow-${connectionUser.username}`;
+
+//                   return (
+//                     <article
+//                       className="connection-user-row"
+//                       key={
+//                         connectionUser.profileUrl ||
+//                         `${connectionUser.username}-${index}`
+//                       }
+//                     >
+//                       <div className="connection-user-main">
+//                         <div className="connection-avatar">
+//                           {connectionUser.avatar ? (
+//                             <img
+//                               src={
+//                                 connectionUser.avatar
+//                               }
+//                               alt={
+//                                 connectionUser.username
+//                               }
+//                             />
+//                           ) : (
+//                             <span>
+//                               {getInitial(
+//                                 connectionUser.username
+//                               )}
+//                             </span>
+//                           )}
+//                         </div>
+
+//                         <div className="connection-user-info">
+//                           <h3>
+//                             {connectionUser.displayName ||
+//                               connectionUser.username}
+//                           </h3>
+
+//                           <p>
+//                             @
+//                             {
+//                               connectionUser.username
+//                             }
+//                           </p>
+
+//                           {connectionUser.domain && (
+//                             <small>
+//                               {
+//                                 connectionUser.domain
+//                               }
+//                             </small>
+//                           )}
+//                         </div>
+//                       </div>
+
+//                       <div className="connection-actions">
+//                         {connectionUser.profileUrl && (
+//                           <a
+//                             href={
+//                               connectionUser.profileUrl
+//                             }
+//                             target="_blank"
+//                             rel="noopener noreferrer"
+//                             className="connection-view-button"
+//                           >
+//                             <FaExternalLinkAlt />
+//                             View
+//                           </a>
+//                         )}
+
+//                         {isOwnProfile &&
+//                           view ===
+//                             "followers" && (
+//                             <button
+//                               type="button"
+//                               className="connection-remove-button"
+//                               onClick={() =>
+//                                 removeFollower(
+//                                   connectionUser.username
+//                                 )
+//                               }
+//                               disabled={
+//                                 removeLoading ||
+//                                 Boolean(
+//                                   actionUser
+//                                 )
+//                               }
+//                             >
+//                               <FaTrashAlt />
+
+//                               {removeLoading
+//                                 ? "Removing..."
+//                                 : "Remove"}
+//                             </button>
+//                           )}
+
+//                         {isOwnProfile &&
+//                           view ===
+//                             "following" && (
+//                             <button
+//                               type="button"
+//                               className="connection-remove-button"
+//                               onClick={() =>
+//                                 unfollowUser(
+//                                   connectionUser.username
+//                                 )
+//                               }
+//                               disabled={
+//                                 unfollowLoading ||
+//                                 Boolean(
+//                                   actionUser
+//                                 )
+//                               }
+//                             >
+//                               <FaUserMinus />
+
+//                               {unfollowLoading
+//                                 ? "Unfollowing..."
+//                                 : "Unfollow"}
+//                             </button>
+//                           )}
+//                       </div>
+//                     </article>
+//                   );
+//                 }
+//               )}
+//             </div>
+//           )}
+//         </section>
+//       </section>
+
+//       {profileModalOpen && (
+//         <div
+//           className="profile-update-backdrop"
+//           onMouseDown={(event) => {
+//             if (
+//               event.target ===
+//               event.currentTarget
+//             ) {
+//               closeProfileModal();
+//             }
+//           }}
+//         >
+//           <section className="profile-update-modal">
+//             <div className="profile-update-header">
+//               <div>
+//                 <p>PROFILE PICTURE</p>
+//                 <h2>Update picture</h2>
+//               </div>
+
+//               <button
+//                 type="button"
+//                 onClick={
+//                   closeProfileModal
+//                 }
+//                 disabled={
+//                   profileUploading
+//                 }
+//               >
+//                 <FaTimes />
+//               </button>
+//             </div>
+
+//             <div className="profile-update-body">
+//               <div className="profile-update-preview">
+//                 {profilePreview ? (
+//                   <img
+//                     src={
+//                       profilePreview
+//                     }
+//                     alt="Profile preview"
+//                   />
+//                 ) : (
+//                   <span>
+//                     {getInitial(
+//                       username
+//                     )}
+//                   </span>
+//                 )}
+//               </div>
+
+//               <h3>@{username}</h3>
+
+//               {selectedProfileFile && (
+//                 <div className="profile-update-file">
+//                   <span>
+//                     {
+//                       selectedProfileFile.name
+//                     }
+//                   </span>
+
+//                   <small>
+//                     {(
+//                       selectedProfileFile.size /
+//                       (1024 * 1024)
+//                     ).toFixed(2)}{" "}
+//                     MB
+//                   </small>
+//                 </div>
+//               )}
+
+//               {profileMessage && (
+//                 <div
+//                   className={`profile-update-message ${
+//                     profileMessage.includes(
+//                       "successfully"
+//                     )
+//                       ? "success"
+//                       : "error"
+//                   }`}
+//                 >
+//                   {profileMessage}
+//                 </div>
+//               )}
+//             </div>
+
+//             <div className="profile-update-actions">
+//               <button
+//                 type="button"
+//                 className="profile-update-change"
+//                 onClick={() =>
+//                   profileInputRef.current?.click()
+//                 }
+//                 disabled={
+//                   profileUploading
+//                 }
+//               >
+//                 <FaCamera />
+//                 Choose another
+//               </button>
+
+//               <button
+//                 type="button"
+//                 className="profile-update-save"
+//                 onClick={
+//                   uploadProfilePicture
+//                 }
+//                 disabled={
+//                   profileUploading ||
+//                   !selectedProfileFile
+//                 }
+//               >
+//                 <FaUpload />
+
+//                 {profileUploading
+//                   ? "Uploading..."
+//                   : "Save picture"}
+//               </button>
+//             </div>
+//           </section>
+//         </div>
+//       )}
+//     </main>
+//   );
+// };
+
+// export default FollowersPage;
+
 import React, {
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -74,7 +1280,7 @@ const FollowersPage = () => {
   );
 
   
-  const addCacheBuster = (url) => {
+  const addCacheBuster = useCallback((url) => {
     if (!url) return "";
 
     const cleanUrl = String(url)
@@ -89,10 +1295,10 @@ const FollowersPage = () => {
       : "?";
 
     return `${cleanUrl}${separator}v=${Date.now()}`;
-  };
+  }, []);
 
   
-  const getProfilePictureUrl = (data) => {
+  const getProfilePictureUrl = useCallback((data) => {
     return (
       data?.profilePic?.url ||
       data?.user?.profilePic?.url ||
@@ -101,7 +1307,7 @@ const FollowersPage = () => {
       data?.icon?.url ||
       ""
     );
-  };
+  }, []);
 
   
   useEffect(() => {
@@ -140,7 +1346,7 @@ const FollowersPage = () => {
     };
   }, [profilePreview]);
 
-  const cleanProfileUrl = (item) => {
+  const cleanProfileUrl = useCallback((item) => {
     if (!item) return "";
 
     const rawUrl =
@@ -167,9 +1373,9 @@ const FollowersPage = () => {
         ""
       );
     }
-  };
+  }, []);
 
-  const getUsernameFromUrl = (profileUrl) => {
+  const getUsernameFromUrl = useCallback((profileUrl) => {
     if (!profileUrl) return "user";
 
     try {
@@ -193,9 +1399,9 @@ const FollowersPage = () => {
           ?.replace(/^@/, "") || "user"
       );
     }
-  };
+  }, []);
 
-  const normalizeUserItem = (item) => {
+  const normalizeUserItem = useCallback((item) => {
     const profileUrl =
       cleanProfileUrl(item);
 
@@ -241,12 +1447,12 @@ const FollowersPage = () => {
       avatar,
       domain,
     };
-  };
+  }, [cleanProfileUrl, getUsernameFromUrl]);
 
   /*
    * Duplicate followers/following remove.
    */
-  const processCollection = (data) => {
+  const processCollection = useCallback((data) => {
     let items = [];
 
     if (Array.isArray(data)) {
@@ -292,10 +1498,10 @@ const FollowersPage = () => {
     return Array.from(
       uniqueMap.values()
     );
-  };
+  }, [normalizeUserItem]);
 
   
-  const fetchProfilePicture = async () => {
+  const fetchProfilePicture = useCallback(async () => {
     if (!username || !apiUrl) return;
 
     const loggedUsername =
@@ -386,12 +1592,12 @@ const FollowersPage = () => {
         );
       }
     }
-  };
+  }, [username, apiUrl, token, addCacheBuster, getProfilePictureUrl]);
 
   /*
    * Followers आणि following fetch.
    */
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!username || !apiUrl) {
       setError(
         "Username or API URL is missing."
@@ -450,7 +1656,7 @@ const FollowersPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [username, apiUrl, headers, processCollection]);
 
   
   useEffect(() => {
@@ -458,7 +1664,7 @@ const FollowersPage = () => {
     fetchProfilePicture();
 
     
-  }, [username, apiUrl, token]);
+  }, [fetchData, fetchProfilePicture]);
 
   const removeFollower = async (
     targetUsername
