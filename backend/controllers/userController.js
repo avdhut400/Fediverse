@@ -154,3 +154,138 @@ exports.getUserPosts = async (req, res) => {
 };
 
 
+exports.getMyProfile = async (req, res) => {
+  try {
+    const userId = req.user?.id || req.user?._id;
+
+    const user = await User.findById(userId).select(
+      "-password -privateKey"
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json(user);
+  } catch (error) {
+    console.error("Get profile error:", error);
+
+    return res.status(500).json({
+      message: "Failed to load profile",
+    });
+  }
+};
+
+// /*
+//  * SET or UPDATE profile picture
+//  */
+
+exports.updateProfilePicture = async (req, res) => {
+  try {
+    const userId =
+      req.user?._id ||
+      req.user?.id ||
+      req.user?.userId;
+
+    if (!userId) {
+      return res.status(401).json({
+        message: "Unauthorized user",
+      });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({
+        message:
+          "Profile picture was not received",
+      });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    user.profilePic = {
+      url: req.file.path,
+      filename: req.file.filename,
+    };
+
+    await user.save();
+
+    return res.status(200).json({
+      message:
+        "Profile picture updated successfully",
+      profilePic: user.profilePic,
+    });
+  } catch (error) {
+    console.error(
+      "Profile update error:",
+      error
+    );
+
+    return res.status(500).json({
+      message:
+        error.message ||
+        "Failed to update profile picture",
+    });
+  }
+};
+// /*
+//  * REMOVE profile picture
+//  */
+
+exports.removeProfilePicture = async (req, res) => {
+  try {
+    const userId = req.user?.id || req.user?._id;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    if (user.profilePic?.filename) {
+      try {
+        await cloudinary.uploader.destroy(
+          user.profilePic.filename
+        );
+      } catch (cloudinaryError) {
+        console.error(
+          "Cloudinary image deletion failed:",
+          cloudinaryError
+        );
+      }
+    }
+
+    user.profilePic = {
+      url: "",
+      filename: "",
+    };
+
+    await user.save();
+
+    return res.status(200).json({
+      message: "Profile picture removed successfully",
+      profilePic: user.profilePic,
+    });
+  } catch (error) {
+    console.error("Remove profile picture error:", error);
+
+    return res.status(500).json({
+      message: "Failed to remove profile picture",
+    });
+  }
+};
+
+
+// module.exports = {
+//   updateProfilePicture,
+//   removeProfilePicture
+// };

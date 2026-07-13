@@ -1,0 +1,473 @@
+.photoflux-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  border-bottom: 1px solid #e7e9f0;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 4px 24px rgba(15, 23, 42, 0.05);
+  backdrop-filter: blur(16px);
+  font-family:
+    Inter,
+    Arial,
+    Helvetica,
+    sans-serif;
+}
+
+.photoflux-navbar-container {
+  width: min(1400px, calc(100% - 34px));
+  min-height: 70px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+/* Brand */
+
+.photoflux-brand {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #111827;
+  text-decoration: none;
+}
+
+.photoflux-brand-icon {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  color: #ffffff;
+  background:
+    linear-gradient(
+      135deg,
+      #4f46e5,
+      #7c3aed
+    );
+  box-shadow:
+    0 8px 19px rgba(79, 70, 229, 0.25);
+  font-size: 18px;
+  font-weight: 850;
+}
+
+.photoflux-brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.photoflux-brand-text strong {
+  color: #111827;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+}
+
+.photoflux-brand-text small {
+  margin-top: 1px;
+  color: #8a93a3;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+}
+
+/* Desktop navigation */
+
+.photoflux-desktop-nav {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}
+
+.photoflux-nav-link {
+  min-height: 40px;
+  padding: 0 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border-radius: 10px;
+  color: #667085;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.photoflux-nav-link svg {
+  font-size: 15px;
+}
+
+.photoflux-nav-link:hover {
+  color: #4f46e5;
+  background: #f2f3ff;
+}
+
+.photoflux-nav-active {
+  color: #4f46e5;
+  background: #eef0ff;
+}
+
+/* Actions */
+
+.photoflux-navbar-actions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.photoflux-create-button {
+  height: 41px;
+  padding: 0 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border-radius: 11px;
+  color: #ffffff;
+  background:
+    linear-gradient(
+      135deg,
+      #4f46e5,
+      #6d5ce7
+    );
+  box-shadow:
+    0 8px 18px rgba(79, 70, 229, 0.2);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 750;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.photoflux-create-button:hover {
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow:
+    0 11px 23px rgba(79, 70, 229, 0.28);
+}
+
+.photoflux-user-area {
+  padding-left: 11px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border-left: 1px solid #e5e7eb;
+}
+
+.photoflux-user-profile {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.photoflux-user-avatar {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #ffffff;
+  background:
+    linear-gradient(
+      135deg,
+      #4f46e5,
+      #8b5cf6
+    );
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.photoflux-user-text {
+  max-width: 90px;
+  display: flex;
+  flex-direction: column;
+}
+
+.photoflux-user-text strong {
+  overflow: hidden;
+  color: #111827;
+  font-size: 11px;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.photoflux-user-text small {
+  margin-top: 2px;
+  color: #9ca3af;
+  font-size: 9px;
+}
+
+.photoflux-logout-button {
+  width: 37px;
+  height: 37px;
+  display: grid;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: #7a8495;
+  background: transparent;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.photoflux-logout-button:hover {
+  border-color: #fecaca;
+  color: #dc2626;
+  background: #fef2f2;
+}
+
+/* Login and signup */
+
+.photoflux-auth-actions {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.photoflux-login-button,
+.photoflux-signup-button {
+  height: 41px;
+  padding: 0 17px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 750;
+  transition: 0.2s ease;
+}
+
+.photoflux-login-button {
+  border: 1px solid #d8dde7;
+  color: #374151;
+  background: #ffffff;
+}
+
+.photoflux-login-button:hover {
+  border-color: #4f46e5;
+  color: #4f46e5;
+  background: #f7f7ff;
+}
+
+.photoflux-signup-button {
+  border: 1px solid #4f46e5;
+  color: #ffffff;
+  background: #4f46e5;
+}
+
+.photoflux-signup-button:hover {
+  color: #ffffff;
+  background: #4338ca;
+}
+
+/* Mobile toggle */
+
+.photoflux-menu-button {
+  width: 41px;
+  height: 41px;
+  display: none;
+  place-items: center;
+  border: 1px solid #dfe3ea;
+  border-radius: 11px;
+  color: #374151;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+/* Mobile menu */
+
+.photoflux-mobile-menu {
+  max-height: 0;
+  overflow: hidden;
+  border-top: 0 solid #edf0f4;
+  background: #ffffff;
+  opacity: 0;
+  transition:
+    max-height 0.3s ease,
+    opacity 0.2s ease,
+    padding 0.3s ease;
+}
+
+.photoflux-mobile-menu-open {
+  max-height: 700px;
+  padding: 16px;
+  border-top-width: 1px;
+  opacity: 1;
+}
+
+.photoflux-mobile-user {
+  margin-bottom: 12px;
+  padding: 13px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  border-radius: 13px;
+  background: #f5f6ff;
+}
+
+.photoflux-mobile-user strong {
+  display: block;
+  color: #111827;
+  font-size: 13px;
+}
+
+.photoflux-mobile-user small {
+  display: block;
+  margin-top: 3px;
+  color: #8a93a3;
+  font-size: 10px;
+}
+
+.photoflux-mobile-links {
+  display: grid;
+  gap: 4px;
+}
+
+.photoflux-mobile-links
+  .photoflux-nav-link {
+  min-height: 45px;
+  padding: 0 14px;
+  justify-content: flex-start;
+  font-size: 13px;
+}
+
+.photoflux-mobile-logout {
+  width: 100%;
+  height: 44px;
+  margin-top: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  color: #dc2626;
+  background: #fef2f2;
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+/* Responsive */
+
+@media (max-width: 1180px) {
+  .photoflux-nav-link {
+    padding: 0 8px;
+  }
+
+  .photoflux-nav-link span {
+    display: none;
+  }
+
+  .photoflux-nav-link svg {
+    font-size: 17px;
+  }
+}
+
+@media (max-width: 860px) {
+  .photoflux-desktop-nav,
+  .photoflux-user-area,
+  .photoflux-create-button {
+    display: none;
+  }
+
+  .photoflux-navbar-container {
+    min-height: 64px;
+  }
+
+  .photoflux-navbar-actions {
+    margin-left: auto;
+  }
+
+  .photoflux-menu-button {
+    display: grid;
+  }
+}
+
+@media (max-width: 480px) {
+  .photoflux-navbar-container {
+    width: calc(100% - 22px);
+  }
+
+  .photoflux-brand-text small {
+    display: none;
+  }
+
+  .photoflux-auth-actions {
+    gap: 5px;
+  }
+
+  .photoflux-login-button,
+  .photoflux-signup-button {
+    height: 38px;
+    padding: 0 11px;
+  }
+
+  .photoflux-login-button svg {
+    display: none;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.photoflux-user-avatar {
+  overflow: hidden;
+}
+
+.photoflux-user-avatar img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.photoflux-user-avatar span {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+
+.photoflux-mobile-user {
+  color: inherit;
+  text-decoration: none;
+}
+
+.photoflux-mobile-user:hover {
+  color: inherit;
+}

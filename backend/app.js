@@ -29,12 +29,20 @@ app.use(express.urlencoded({ extended: true }));
 // app.use(express.json());
 
 
-
+// app.put("/api/users/me/profile-picture", (req, res) => {
+//   return res.status(200).json({
+//     message: "Profile picture route is working",
+//   });
+// });
 
 
 
 app.use("/replies", replyRoutes);
 app.use('/api/posts', commentRoutes);
+
+
+
+
 
 
 app.use("/follow", followRoutes);

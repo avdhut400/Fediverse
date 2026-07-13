@@ -1,21 +1,46 @@
 const express = require("express");
 const router = express.Router();
+const multer = require("multer");
+const { storage } = require("../utils/cloudinary");
 const { 
   getAllUsers,
   getUserById,
   getUserPosts,
   followUser,
-  unfollowUser 
+  unfollowUser ,
+  getMyProfile,
+  updateProfilePicture,
+  removeProfilePicture,
+
 } = require("../controllers/userController");
 
 const { verifyToken } = require("../middleware/authMiddleware");
+
+
 const User = require("../models/User");
+
+const upload = multer({ storage });
+
+
 
 router.get("/", getAllUsers);
 router.get("/:id", getUserById);
 router.post("/:username/follow", verifyToken, followUser);
 router.post("/:username/unfollow", verifyToken, unfollowUser);
 router.get("/:username/posts", getUserPosts);
+
+
+
+
+
+
+
+
+
+console.log("verifyToken:", typeof verifyToken);
+console.log("upload.single:", typeof upload.single);
+console.log("updateProfilePicture:", typeof updateProfilePicture);
+
 
 
 
@@ -124,6 +149,21 @@ router.delete("/:username/following/:followingUsername", async (req, res) => {
   }
 });
 
+
+// router.get("/me", verifyToken, getMyProfile);
+
+router.put(
+  "/me/profile-picture",
+  verifyToken,
+  upload.single("profilePic"),
+  updateProfilePicture
+);
+
+// router.delete(
+//   "/me/profile-picture",
+//   verifyToken,
+//   removeProfilePicture
+// );
 
 
 

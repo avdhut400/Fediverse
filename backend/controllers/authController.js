@@ -6,29 +6,98 @@ const Post = require("../models/Post");
 const sendGreetingEmail=require("./mail")
 
 
+// exports.register = async (req, res) => {
+//   const { username, password, email } = req.body;
+
+//   const existingUser = await User.findOne({ username });
+//   if (existingUser)
+//     return res.status(400).json({ error: "User already exists" });
+
+//   // const hashed = await bcrypt.hash(password, 10);
+
+//   const user = await User.create({
+//     username,
+//     password,
+//     email,
+//     actorUrl: `${process.env.BASE_URL}/users/${username}`,
+//     inbox: `${process.env.BASE_URL}/users/${username}/inbox`,    
+//     outbox: `${process.env.BASE_URL}/users/${username}/outbox`,   
+//   });
+//   sendGreetingEmail(email, username)
+//   .then(() => console.log("Welcome email sent"))
+//   .catch((err) => console.error("❌ Failed to send greeting email:", err));
+
+//   res.status(201).json({ message: "User created" });
+// };
+
+
+
 exports.register = async (req, res) => {
-  const { username, password, email } = req.body;
+  try {
+    const { username, password, email } = req.body;
 
-  const existingUser = await User.findOne({ username });
-  if (existingUser)
-    return res.status(400).json({ error: "User already exists" });
+    if (!username || !password || !email) {
+      return res.status(400).json({
+        error: "Username, password and email are required",
+      });
+    }
 
-  // const hashed = await bcrypt.hash(password, 10);
+    const existingUser = await User.findOne({
+      $or: [{ username }, { email }],
+    });
 
-  const user = await User.create({
-    username,
-    password,
-    email,
-    actorUrl: `${process.env.BASE_URL}/users/${username}`,
-    inbox: `${process.env.BASE_URL}/users/${username}/inbox`,    
-    outbox: `${process.env.BASE_URL}/users/${username}/outbox`,   
-  });
-  sendGreetingEmail(email, username)
-  .then(() => console.log("Welcome email sent"))
-  .catch((err) => console.error("❌ Failed to send greeting email:", err));
+    if (existingUser) {
+      return res.status(400).json({
+        error: "Username or email already exists",
+      });
+    }
 
-  res.status(201).json({ message: "User created" });
+    const user = await User.create({
+      username,
+      password,
+      email,
+      actorUrl: `${process.env.BASE_URL}/users/${username}`,
+      inbox: `${process.env.BASE_URL}/users/${username}/inbox`,
+      outbox: `${process.env.BASE_URL}/users/${username}/outbox`,
+    });
+
+    try {
+      await sendGreetingEmail(email, username);
+      console.log("✅ Welcome email sent");
+    } catch (mailError) {
+      console.error(
+        "❌ Failed to send greeting email:",
+        mailError.message
+      );
+
+    
+    }
+
+    return res.status(201).json({
+      message: "User created successfully",
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    console.error("❌ Registration error:", error);
+
+    return res.status(500).json({
+      error: "Server error while registering user",
+      details: error.message,
+    });
+  }
 };
+
+
+
+
+
+
+
+
 
 
 
@@ -40,21 +109,21 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   const { username, password } = req.body;
 
-  console.log("📥 Login attempt:", username, password);
+  // console.log("📥 Login attempt:", username, password);
 
   const user = await User.findOne({ username }).select("+password +privateKey");
-  console.log("👤 Found user from DB:", user);
+  // console.log("👤 Found user from DB:", user);
 
   if (!user || !user.password) {
-    console.log("❌ User not found or password missing");
+    // console.log("❌ User not found or password missing");
     return res.status(401).json({ error: "Invalid credentials" });
   }
 
   const isMatch = await user.comparePassword(password);
-  console.log("🔐 Password match result:", isMatch);
+  // console.log("🔐 Password match result:", isMatch);
 
   if (!isMatch) {
-    console.log("❌ Password did not match");
+    // console.log("❌ Password did not match");
     return res.status(401).json({ error: "Invalid credentials" });
   }
 
@@ -63,7 +132,7 @@ exports.login = async (req, res) => {
     username: user.username,
     actor: `${process.env.BASE_URL}/users/${user.username}`, 
   }, process.env.JWT_SECRET, { expiresIn: "7d" });
-  console.log(" Token created:", token);
+  // console.log(" Token created:", token);
 
   const userData = user.toObject();
   delete userData.password;
