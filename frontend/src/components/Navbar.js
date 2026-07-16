@@ -501,6 +501,510 @@
 
 
 
+// import React, { useEffect, useState } from "react";
+// import axios from "axios";
+
+// import {
+//   Link,
+//   NavLink,
+//   useLocation,
+//   useNavigate,
+// } from "react-router-dom";
+
+// import {
+//   FaBars,
+//   FaHome,
+//   FaImages,
+//   FaPlus,
+//   FaSearch,
+//   FaSignInAlt,
+//   FaSignOutAlt,
+//   FaTimes,
+//   FaUserFriends,
+// } from "react-icons/fa";
+
+// import {
+//   MdDynamicFeed,
+//   MdExplore,
+// } from "react-icons/md";
+
+// import "./Navbar.css";
+
+// function Navbar() {
+//   const navigate = useNavigate();
+//   const location = useLocation();
+
+//   const [menuOpen, setMenuOpen] = useState(false);
+//   const [profilePic, setProfilePic] = useState("");
+
+//   const token = localStorage.getItem("token");
+//   const username = localStorage.getItem("username");
+
+//   const apiUrl = process.env.REACT_APP_API_URL;
+
+//   const isLoggedIn = Boolean(token);
+
+//   const addCacheBuster = (url) => {
+//     if (!url) return "";
+
+//     const cleanUrl = String(url)
+//       .replace(
+//         /([?&])v=\d+(&|$)/,
+//         "$1"
+//       )
+//       .replace(/[?&]$/, "");
+
+//     const separator = cleanUrl.includes("?")
+//       ? "&"
+//       : "?";
+
+//     return `${cleanUrl}${separator}v=${Date.now()}`;
+//   };
+
+//   /*
+//    * Page route change झाल्यावर mobile menu close.
+//    */
+//   useEffect(() => {
+//     setMenuOpen(false);
+//   }, [location.pathname]);
+
+//   /*
+//    * Refresh झाल्यावर profile picture backend मधून fetch.
+//    */
+//   useEffect(() => {
+//     const fetchProfilePicture = async () => {
+//       if (!token || !apiUrl) {
+//         setProfilePic("");
+//         return;
+//       }
+
+//       try {
+//         const response = await axios.get(
+//           `${apiUrl}/api/users/me`,
+//           {
+//             headers: {
+//               Authorization: `Bearer ${token}`,
+//               "ngrok-skip-browser-warning": "true",
+//             },
+//           }
+//         );
+
+//         const imageUrl =
+//           response.data?.profilePic?.url ||
+//           response.data?.user?.profilePic?.url ||
+//           response.data?.profilePic ||
+//           "";
+
+//         if (imageUrl) {
+//           setProfilePic(
+//             addCacheBuster(imageUrl)
+//           );
+
+//           localStorage.setItem(
+//             "profilePic",
+//             imageUrl
+//           );
+//         } else {
+//           setProfilePic("");
+//           localStorage.removeItem("profilePic");
+//         }
+//       } catch (error) {
+//         console.error(
+//           "Navbar profile fetch failed:",
+//           error.response?.data ||
+//             error.message
+//         );
+
+//         const savedImage =
+//           localStorage.getItem("profilePic");
+
+//         if (savedImage) {
+//           setProfilePic(
+//             addCacheBuster(savedImage)
+//           );
+//         } else {
+//           setProfilePic("");
+//         }
+//       }
+//     };
+
+//     fetchProfilePicture();
+//   }, [token, apiUrl, username]);
+
+//   /*
+//    * FollowersPage मधून profile picture update झाल्यावर
+//    * Navbar लगेच update होईल.
+//    */
+//   useEffect(() => {
+//     const handleProfilePictureUpdated = (
+//       event
+//     ) => {
+//       const newImageUrl = event.detail;
+
+//       if (!newImageUrl) return;
+
+//       localStorage.setItem(
+//         "profilePic",
+//         newImageUrl
+//       );
+
+//       setProfilePic(
+//         addCacheBuster(newImageUrl)
+//       );
+//     };
+
+//     window.addEventListener(
+//       "profile-picture-updated",
+//       handleProfilePictureUpdated
+//     );
+
+//     return () => {
+//       window.removeEventListener(
+//         "profile-picture-updated",
+//         handleProfilePictureUpdated
+//       );
+//     };
+//   }, []);
+
+//   const handleLogout = () => {
+//     localStorage.removeItem("token");
+//     localStorage.removeItem("username");
+//     localStorage.removeItem("profilePic");
+
+//     setProfilePic("");
+//     setMenuOpen(false);
+
+//     navigate("/login");
+//   };
+
+//   const getNavLinkClass = ({
+//     isActive,
+//   }) =>
+//     `photoflux-nav-link ${
+//       isActive
+//         ? "photoflux-nav-active"
+//         : ""
+//     }`;
+
+//   const getInitial = () =>
+//     username
+//       ?.trim()
+//       ?.charAt(0)
+//       ?.toUpperCase() || "U";
+
+//   const renderUserAvatar = () => {
+//     if (profilePic) {
+//       return (
+//         <img
+//           src={profilePic}
+//           alt={`${username} profile`}
+//           onError={() => {
+//             const savedImage =
+//               localStorage.getItem(
+//                 "profilePic"
+//               );
+
+//             if (
+//               savedImage &&
+//               !profilePic.includes(savedImage)
+//             ) {
+//               setProfilePic(
+//                 addCacheBuster(savedImage)
+//               );
+//             } else {
+//               setProfilePic("");
+//             }
+//           }}
+//         />
+//       );
+//     }
+
+//     return <span>{getInitial()}</span>;
+//   };
+
+//   return (
+//     <nav className="photoflux-navbar">
+//       <div className="photoflux-navbar-container">
+//         {/* Brand */}
+
+//         <Link
+//           className="photoflux-brand"
+//           to={isLoggedIn ? "/" : "/login"}
+//           onClick={() => setMenuOpen(false)}
+//         >
+//           <span className="photoflux-brand-icon">
+//             P
+//           </span>
+
+//           <div className="photoflux-brand-text">
+//             <strong>PhotoFlux</strong>
+//             <small>Fediverse</small>
+//           </div>
+//         </Link>
+
+//         {/* Desktop navigation */}
+
+//         {isLoggedIn && (
+//           <div className="photoflux-desktop-nav">
+//             <NavLink
+//               className={getNavLinkClass}
+//               to="/"
+//               end
+//             >
+//               <FaHome />
+//               <span>Home</span>
+//             </NavLink>
+
+//             <NavLink
+//               className={getNavLinkClass}
+//               to="/feed"
+//             >
+//               <MdDynamicFeed />
+//               <span>Feed</span>
+//             </NavLink>
+
+//             <NavLink
+//               className={getNavLinkClass}
+//               to="/local-users"
+//             >
+//               <MdExplore />
+//               <span>Discover</span>
+//             </NavLink>
+
+//             <NavLink
+//               className={getNavLinkClass}
+//               to="/remote-search"
+//             >
+//               <FaSearch />
+//               <span>Remote</span>
+//             </NavLink>
+
+//             <NavLink
+//               className={getNavLinkClass}
+//               to={`/followers/${username}`}
+//             >
+//               <FaUserFriends />
+//               <span>Connections</span>
+//             </NavLink>
+
+//             <NavLink
+//               className={getNavLinkClass}
+//               to={`/users/${username}/outbox`}
+//             >
+//               <FaImages />
+//               <span>Outbox</span>
+//             </NavLink>
+//           </div>
+//         )}
+
+//         {/* Right side actions */}
+
+//         <div className="photoflux-navbar-actions">
+//           {isLoggedIn ? (
+//             <>
+//               <Link
+//                 to="/post"
+//                 className="photoflux-create-button"
+//               >
+//                 <FaPlus />
+//                 <span>Create</span>
+//               </Link>
+
+//               <div className="photoflux-user-area">
+//                 <Link
+//                   to={`/followers/${username}`}
+//                   className="photoflux-user-profile"
+//                 >
+//                   <div className="photoflux-user-avatar">
+//                     {renderUserAvatar()}
+//                   </div>
+
+//                   <div className="photoflux-user-text">
+//                     <strong>
+//                       {username || "User"}
+//                     </strong>
+
+//                     <small>
+//                       My profile
+//                     </small>
+//                   </div>
+//                 </Link>
+
+//                 <button
+//                   type="button"
+//                   className="photoflux-logout-button"
+//                   onClick={handleLogout}
+//                   aria-label="Logout"
+//                   title="Logout"
+//                 >
+//                   <FaSignOutAlt />
+//                 </button>
+//               </div>
+//             </>
+//           ) : (
+//             <div className="photoflux-auth-actions">
+//               <Link
+//                 to="/login"
+//                 className="photoflux-login-button"
+//               >
+//                 <FaSignInAlt />
+//                 Login
+//               </Link>
+
+//               <Link
+//                 to="/signup"
+//                 className="photoflux-signup-button"
+//               >
+//                 Sign up
+//               </Link>
+//             </div>
+//           )}
+
+//           {/* Mobile toggle */}
+
+//           {isLoggedIn && (
+//             <button
+//               type="button"
+//               className="photoflux-menu-button"
+//               onClick={() =>
+//                 setMenuOpen(
+//                   (current) => !current
+//                 )
+//               }
+//               aria-label="Toggle navigation"
+//               aria-expanded={menuOpen}
+//             >
+//               {menuOpen ? (
+//                 <FaTimes />
+//               ) : (
+//                 <FaBars />
+//               )}
+//             </button>
+//           )}
+//         </div>
+//       </div>
+
+//       {/* Mobile navigation */}
+
+//       {isLoggedIn && (
+//         <div
+//           className={`photoflux-mobile-menu ${
+//             menuOpen
+//               ? "photoflux-mobile-menu-open"
+//               : ""
+//           }`}
+//         >
+//           <Link
+//             to={`/followers/${username}`}
+//             className="photoflux-mobile-user"
+//           >
+//             <div className="photoflux-user-avatar">
+//               {renderUserAvatar()}
+//             </div>
+
+//             <div>
+//               <strong>
+//                 @{username}
+//               </strong>
+
+//               <small>
+//                 PhotoFlux account
+//               </small>
+//             </div>
+//           </Link>
+
+//           <div className="photoflux-mobile-links">
+//             <NavLink
+//               className={getNavLinkClass}
+//               to="/"
+//               end
+//             >
+//               <FaHome />
+//               Home
+//             </NavLink>
+
+//             <NavLink
+//               className={getNavLinkClass}
+//               to="/feed"
+//             >
+//               <MdDynamicFeed />
+//               Feed
+//             </NavLink>
+
+//             <NavLink
+//               className={getNavLinkClass}
+//               to="/post"
+//             >
+//               <FaPlus />
+//               Create post
+//             </NavLink>
+
+//             <NavLink
+//               className={getNavLinkClass}
+//               to="/local-users"
+//             >
+//               <MdExplore />
+//               Local users
+//             </NavLink>
+
+//             <NavLink
+//               className={getNavLinkClass}
+//               to="/remote-search"
+//             >
+//               <FaSearch />
+//               Remote search
+//             </NavLink>
+
+//             <NavLink
+//               className={getNavLinkClass}
+//               to={`/followers/${username}`}
+//             >
+//               <FaUserFriends />
+//               Followers & following
+//             </NavLink>
+
+//             <NavLink
+//               className={getNavLinkClass}
+//               to={`/users/${username}/outbox`}
+//             >
+//               <FaImages />
+//               My outbox
+//             </NavLink>
+//           </div>
+
+//           <button
+//             type="button"
+//             className="photoflux-mobile-logout"
+//             onClick={handleLogout}
+//           >
+//             <FaSignOutAlt />
+//             Logout
+//           </button>
+//         </div>
+//       )}
+//     </nav>
+//   );
+// }
+
+// export default Navbar;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -513,11 +1017,9 @@ import {
 
 import {
   FaBars,
-  FaHome,
   FaImages,
   FaPlus,
   FaSearch,
-  FaSignInAlt,
   FaSignOutAlt,
   FaTimes,
   FaUserFriends,
@@ -539,7 +1041,6 @@ function Navbar() {
 
   const token = localStorage.getItem("token");
   const username = localStorage.getItem("username");
-
   const apiUrl = process.env.REACT_APP_API_URL;
 
   const isLoggedIn = Boolean(token);
@@ -548,10 +1049,7 @@ function Navbar() {
     if (!url) return "";
 
     const cleanUrl = String(url)
-      .replace(
-        /([?&])v=\d+(&|$)/,
-        "$1"
-      )
+      .replace(/([?&])v=\d+(&|$)/, "$1")
       .replace(/[?&]$/, "");
 
     const separator = cleanUrl.includes("?")
@@ -561,16 +1059,10 @@ function Navbar() {
     return `${cleanUrl}${separator}v=${Date.now()}`;
   };
 
-  /*
-   * Page route change झाल्यावर mobile menu close.
-   */
   useEffect(() => {
     setMenuOpen(false);
   }, [location.pathname]);
 
-  /*
-   * Refresh झाल्यावर profile picture backend मधून fetch.
-   */
   useEffect(() => {
     const fetchProfilePicture = async () => {
       if (!token || !apiUrl) {
@@ -596,14 +1088,8 @@ function Navbar() {
           "";
 
         if (imageUrl) {
-          setProfilePic(
-            addCacheBuster(imageUrl)
-          );
-
-          localStorage.setItem(
-            "profilePic",
-            imageUrl
-          );
+          setProfilePic(addCacheBuster(imageUrl));
+          localStorage.setItem("profilePic", imageUrl);
         } else {
           setProfilePic("");
           localStorage.removeItem("profilePic");
@@ -611,17 +1097,14 @@ function Navbar() {
       } catch (error) {
         console.error(
           "Navbar profile fetch failed:",
-          error.response?.data ||
-            error.message
+          error.response?.data || error.message
         );
 
         const savedImage =
           localStorage.getItem("profilePic");
 
         if (savedImage) {
-          setProfilePic(
-            addCacheBuster(savedImage)
-          );
+          setProfilePic(addCacheBuster(savedImage));
         } else {
           setProfilePic("");
         }
@@ -631,14 +1114,8 @@ function Navbar() {
     fetchProfilePicture();
   }, [token, apiUrl, username]);
 
-  /*
-   * FollowersPage मधून profile picture update झाल्यावर
-   * Navbar लगेच update होईल.
-   */
   useEffect(() => {
-    const handleProfilePictureUpdated = (
-      event
-    ) => {
+    const handleProfilePictureUpdated = (event) => {
       const newImageUrl = event.detail;
 
       if (!newImageUrl) return;
@@ -677,43 +1154,17 @@ function Navbar() {
     navigate("/login");
   };
 
-  const getNavLinkClass = ({
-    isActive,
-  }) =>
-    `photoflux-nav-link ${
-      isActive
-        ? "photoflux-nav-active"
-        : ""
-    }`;
-
   const getInitial = () =>
-    username
-      ?.trim()
-      ?.charAt(0)
-      ?.toUpperCase() || "U";
+    username?.trim()?.charAt(0)?.toUpperCase() || "U";
 
   const renderUserAvatar = () => {
     if (profilePic) {
       return (
         <img
           src={profilePic}
-          alt={`${username} profile`}
+          alt={`${username || "User"} profile`}
           onError={() => {
-            const savedImage =
-              localStorage.getItem(
-                "profilePic"
-              );
-
-            if (
-              savedImage &&
-              !profilePic.includes(savedImage)
-            ) {
-              setProfilePic(
-                addCacheBuster(savedImage)
-              );
-            } else {
-              setProfilePic("");
-            }
+            setProfilePic("");
           }}
         />
       );
@@ -722,268 +1173,308 @@ function Navbar() {
     return <span>{getInitial()}</span>;
   };
 
+  const getNavClass = ({ isActive }) =>
+    `photoflux-pill-link ${
+      isActive ? "photoflux-pill-link-active" : ""
+    }`;
+
+  const DesktopNavText = ({ children }) => (
+    <span className="photoflux-link-animation">
+      <span className="photoflux-link-first">
+        {children}
+      </span>
+
+      <span className="photoflux-link-second">
+        {children}
+      </span>
+    </span>
+  );
+
   return (
-    <nav className="photoflux-navbar">
-      <div className="photoflux-navbar-container">
-        {/* Brand */}
-
+    <header className="photoflux-navbar-wrapper">
+      <nav className="photoflux-pill-navbar">
+        {/* Logo */}
         <Link
-          className="photoflux-brand"
           to={isLoggedIn ? "/" : "/login"}
-          onClick={() => setMenuOpen(false)}
+          className="photoflux-pill-logo"
+          aria-label="PhotoFlux home"
         >
-          <span className="photoflux-brand-icon">
-            P
-          </span>
+          <svg
+            width="34"
+            height="34"
+            viewBox="0 0 32 32"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              cx="4.706"
+              cy="16"
+              r="4.706"
+              fill="currentColor"
+            />
 
-          <div className="photoflux-brand-text">
-            <strong>PhotoFlux</strong>
-            <small>Fediverse</small>
-          </div>
+            <circle
+              cx="16.001"
+              cy="4.706"
+              r="4.706"
+              fill="currentColor"
+            />
+
+            <circle
+              cx="16.001"
+              cy="27.294"
+              r="4.706"
+              fill="currentColor"
+            />
+
+            <circle
+              cx="27.294"
+              cy="16"
+              r="4.706"
+              fill="currentColor"
+            />
+          </svg>
+
+          <span className="photoflux-pill-brand-name">
+            PhotoFlux
+          </span>
         </Link>
 
-        {/* Desktop navigation */}
-
+        {/* Desktop links */}
         {isLoggedIn && (
-          <div className="photoflux-desktop-nav">
+          <div className="photoflux-pill-desktop-links">
             <NavLink
-              className={getNavLinkClass}
               to="/"
               end
+              className={getNavClass}
             >
-              <FaHome />
-              <span>Home</span>
+              <DesktopNavText>
+                Home
+              </DesktopNavText>
             </NavLink>
 
             <NavLink
-              className={getNavLinkClass}
               to="/feed"
+              className={getNavClass}
             >
-              <MdDynamicFeed />
-              <span>Feed</span>
+              <DesktopNavText>
+                Feed
+              </DesktopNavText>
             </NavLink>
 
             <NavLink
-              className={getNavLinkClass}
               to="/local-users"
+              className={getNavClass}
             >
-              <MdExplore />
-              <span>Discover</span>
+              <DesktopNavText>
+                Discover
+              </DesktopNavText>
             </NavLink>
 
             <NavLink
-              className={getNavLinkClass}
               to="/remote-search"
+              className={getNavClass}
             >
-              <FaSearch />
-              <span>Remote</span>
+              <DesktopNavText>
+                Remote
+              </DesktopNavText>
             </NavLink>
 
             <NavLink
-              className={getNavLinkClass}
               to={`/followers/${username}`}
+              className={getNavClass}
             >
-              <FaUserFriends />
-              <span>Connections</span>
+              <DesktopNavText>
+                Connections
+              </DesktopNavText>
             </NavLink>
 
             <NavLink
-              className={getNavLinkClass}
               to={`/users/${username}/outbox`}
+              className={getNavClass}
             >
-              <FaImages />
-              <span>Outbox</span>
+              <DesktopNavText>
+                Outbox
+              </DesktopNavText>
             </NavLink>
           </div>
         )}
 
-        {/* Right side actions */}
-
-        <div className="photoflux-navbar-actions">
+        {/* Right actions */}
+        <div className="photoflux-pill-actions">
           {isLoggedIn ? (
             <>
               <Link
                 to="/post"
-                className="photoflux-create-button"
+                className="photoflux-pill-outline-button"
               >
                 <FaPlus />
                 <span>Create</span>
               </Link>
 
-              <div className="photoflux-user-area">
-                <Link
-                  to={`/followers/${username}`}
-                  className="photoflux-user-profile"
-                >
-                  <div className="photoflux-user-avatar">
-                    {renderUserAvatar()}
-                  </div>
+              <Link
+                to={`/followers/${username}`}
+                className="photoflux-pill-profile"
+                title="Open profile"
+              >
+                <div className="photoflux-pill-avatar">
+                  {renderUserAvatar()}
+                </div>
 
-                  <div className="photoflux-user-text">
-                    <strong>
-                      {username || "User"}
-                    </strong>
+                <span>{username || "User"}</span>
+              </Link>
 
-                    <small>
-                      My profile
-                    </small>
-                  </div>
-                </Link>
-
-                <button
-                  type="button"
-                  className="photoflux-logout-button"
-                  onClick={handleLogout}
-                  aria-label="Logout"
-                  title="Logout"
-                >
-                  <FaSignOutAlt />
-                </button>
-              </div>
+              <button
+                type="button"
+                className="photoflux-pill-main-button photoflux-pill-logout"
+                onClick={handleLogout}
+              >
+                <FaSignOutAlt />
+                <span>Logout</span>
+              </button>
             </>
           ) : (
-            <div className="photoflux-auth-actions">
+            <>
               <Link
                 to="/login"
-                className="photoflux-login-button"
+                className="photoflux-pill-outline-button"
               >
-                <FaSignInAlt />
                 Login
               </Link>
 
               <Link
                 to="/signup"
-                className="photoflux-signup-button"
+                className="photoflux-pill-main-button"
               >
-                Sign up
+                Get Started
               </Link>
-            </div>
+            </>
           )}
 
-          {/* Mobile toggle */}
-
-          {isLoggedIn && (
-            <button
-              type="button"
-              className="photoflux-menu-button"
-              onClick={() =>
-                setMenuOpen(
-                  (current) => !current
-                )
-              }
-              aria-label="Toggle navigation"
-              aria-expanded={menuOpen}
-            >
-              {menuOpen ? (
-                <FaTimes />
-              ) : (
-                <FaBars />
-              )}
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Mobile navigation */}
-
-      {isLoggedIn && (
-        <div
-          className={`photoflux-mobile-menu ${
-            menuOpen
-              ? "photoflux-mobile-menu-open"
-              : ""
-          }`}
-        >
-          <Link
-            to={`/followers/${username}`}
-            className="photoflux-mobile-user"
+          <button
+            type="button"
+            className="photoflux-pill-menu-button"
+            onClick={() =>
+              setMenuOpen((current) => !current)
+            }
+            aria-label="Toggle navigation menu"
+            aria-expanded={menuOpen}
           >
-            <div className="photoflux-user-avatar">
-              {renderUserAvatar()}
-            </div>
+            {menuOpen ? <FaTimes /> : <FaBars />}
+          </button>
+        </div>
+      </nav>
 
-            <div>
-              <strong>
-                @{username}
-              </strong>
+      {/* Mobile menu */}
+      <div
+        className={`photoflux-pill-mobile-menu ${
+          menuOpen
+            ? "photoflux-pill-mobile-menu-open"
+            : ""
+        }`}
+      >
+        {isLoggedIn ? (
+          <>
+            <Link
+              to={`/followers/${username}`}
+              className="photoflux-mobile-profile"
+            >
+              <div className="photoflux-pill-avatar">
+                {renderUserAvatar()}
+              </div>
 
-              <small>
-                PhotoFlux account
-              </small>
-            </div>
-          </Link>
+              <div>
+                <strong>@{username || "User"}</strong>
+                <span>PhotoFlux account</span>
+              </div>
+            </Link>
 
-          <div className="photoflux-mobile-links">
             <NavLink
-              className={getNavLinkClass}
               to="/"
               end
+              className={getNavClass}
             >
-              <FaHome />
               Home
             </NavLink>
 
             <NavLink
-              className={getNavLinkClass}
               to="/feed"
+              className={getNavClass}
             >
               <MdDynamicFeed />
               Feed
             </NavLink>
 
             <NavLink
-              className={getNavLinkClass}
               to="/post"
+              className={getNavClass}
             >
               <FaPlus />
               Create post
             </NavLink>
 
             <NavLink
-              className={getNavLinkClass}
               to="/local-users"
+              className={getNavClass}
             >
               <MdExplore />
-              Local users
+              Discover users
             </NavLink>
 
             <NavLink
-              className={getNavLinkClass}
               to="/remote-search"
+              className={getNavClass}
             >
               <FaSearch />
               Remote search
             </NavLink>
 
             <NavLink
-              className={getNavLinkClass}
               to={`/followers/${username}`}
+              className={getNavClass}
             >
               <FaUserFriends />
-              Followers & following
+              Connections
             </NavLink>
 
             <NavLink
-              className={getNavLinkClass}
               to={`/users/${username}/outbox`}
+              className={getNavClass}
             >
               <FaImages />
               My outbox
             </NavLink>
-          </div>
 
-          <button
-            type="button"
-            className="photoflux-mobile-logout"
-            onClick={handleLogout}
-          >
-            <FaSignOutAlt />
-            Logout
-          </button>
-        </div>
-      )}
-    </nav>
+            <button
+              type="button"
+              className="photoflux-mobile-logout-button"
+              onClick={handleLogout}
+            >
+              <FaSignOutAlt />
+              Logout
+            </button>
+          </>
+        ) : (
+          <div className="photoflux-mobile-auth-buttons">
+            <Link
+              to="/login"
+              className="photoflux-pill-outline-button"
+            >
+              Login
+            </Link>
+
+            <Link
+              to="/signup"
+              className="photoflux-pill-main-button"
+            >
+              Get Started
+            </Link>
+          </div>
+        )}
+      </div>
+    </header>
   );
 }
 
 export default Navbar;
+

@@ -1,0 +1,253 @@
+
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap");
+
+.photoflux-footer-background {
+  padding: 80px 16px 0;
+  overflow: hidden;
+  font-family: "Geist", sans-serif;
+  background: #000000;
+}
+
+.photoflux-footer {
+  position: relative;
+  width: 100%;
+  max-width: 1350px;
+  margin: 0 auto;
+  padding: 50px 0 0;
+  overflow: hidden;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: none;
+  border-top-left-radius: 32px;
+  border-top-right-radius: 32px;
+  background:
+    radial-gradient(
+      circle at 15% 20%,
+      rgba(99, 102, 241, 0.08),
+      transparent 30%
+    ),
+    #131314;
+  box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.35);
+}
+
+.photoflux-footer-brand {
+  max-width: 500px;
+}
+
+.photoflux-footer-logo {
+  width: 62px;
+  height: 62px;
+  flex-shrink: 0;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.14);
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+.photoflux-brand-name {
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 750;
+  letter-spacing: -0.7px;
+}
+
+.photoflux-brand-label {
+  color: #a3a3a3;
+  font-size: 13px;
+}
+
+.photoflux-footer-description {
+  max-width: 450px;
+  margin-top: 26px;
+  margin-bottom: 26px;
+  color: #b5b5b5;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.photoflux-social-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.photoflux-social-button {
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.045);
+  transition:
+    color 0.25s ease,
+    border-color 0.25s ease,
+    background-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.photoflux-social-button:hover {
+  color: #c4b5fd;
+  border-color: rgba(139, 92, 246, 0.5);
+  background: rgba(139, 92, 246, 0.12);
+  transform: translateY(-3px);
+}
+
+.photoflux-social-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
+}
+
+.photoflux-footer-heading {
+  margin-bottom: 19px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.photoflux-footer-list {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.photoflux-footer-list li {
+  margin-bottom: 12px;
+}
+
+.photoflux-footer-link {
+  display: inline;
+  padding: 0;
+  color: #a3a3a3;
+  font-family: inherit;
+  font-size: 13px;
+  text-align: left;
+  text-decoration: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.photoflux-footer-link:hover {
+  color: #ffffff;
+}
+
+.photoflux-footer-link:focus {
+  color: #c4b5fd;
+  outline: none;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.photoflux-legal-section {
+  margin-top: 55px;
+  padding: 24px 0;
+  color: #777777;
+  font-size: 11px;
+  line-height: 1.7;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.photoflux-legal-section p {
+  margin-bottom: 9px;
+}
+
+.photoflux-footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 0;
+  color: #808080;
+  font-size: 13px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.photoflux-footer-wordmark-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.photoflux-footer-glow {
+  position: absolute;
+  right: 0;
+  bottom: -100px;
+  left: 0;
+  width: 70%;
+  height: 150px;
+  margin: auto;
+  border-radius: 50%;
+  background: rgba(99, 102, 241, 0.25);
+  filter: blur(100px);
+  pointer-events: none;
+}
+
+.photoflux-footer-wordmark {
+  position: relative;
+  z-index: 1;
+  margin: 35px 0 -4px;
+  color: transparent;
+  font-size: clamp(60px, 14vw, 190px);
+  font-weight: 850;
+  line-height: 0.72;
+  text-align: center;
+  letter-spacing: -8px;
+  -webkit-text-stroke: 1px rgba(99, 102, 241, 0.42);
+  user-select: none;
+}
+
+@media (max-width: 991px) {
+  .photoflux-footer {
+    padding-top: 42px;
+  }
+
+  .photoflux-footer-brand {
+    max-width: 100%;
+  }
+
+  .photoflux-footer-wordmark {
+    letter-spacing: -5px;
+  }
+}
+
+@media (max-width: 576px) {
+  .photoflux-footer-background {
+    padding: 55px 8px 0;
+  }
+
+  .photoflux-footer {
+    padding-top: 34px;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+  }
+
+  .photoflux-footer-logo {
+    width: 54px;
+    height: 54px;
+  }
+
+  .photoflux-brand-name {
+    font-size: 24px;
+  }
+
+  .photoflux-footer-bottom {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .photoflux-footer-wordmark {
+    margin-top: 32px;
+    font-size: clamp(52px, 20vw, 100px);
+    letter-spacing: -3px;
+  }
+
+  .photoflux-legal-section {
+    font-size: 10px;
+  }
+}

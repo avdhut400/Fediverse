@@ -805,6 +805,7 @@
 
 // export default FeedPage;
 
+import "./Feed.css"; 
 
 import React, { useEffect, useState, useContext, useCallback } from "react";
 import axios from "axios";
@@ -1172,7 +1173,7 @@ const FeedPage = () => {
   }
 
   return (
-    <div className="min-vh-100 bg-light">
+    <div className="min-vh-100 photoflux-feed-page">
      
       
 

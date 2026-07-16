@@ -1,4 +1,4 @@
-.photoflux-navbar {
+/* .photoflux-navbar {
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -23,7 +23,7 @@
   gap: 24px;
 }
 
-/* Brand */
+
 
 .photoflux-brand {
   flex-shrink: 0;
@@ -74,7 +74,6 @@
   text-transform: uppercase;
 }
 
-/* Desktop navigation */
 
 .photoflux-desktop-nav {
   flex: 1;
@@ -116,7 +115,6 @@
   background: #eef0ff;
 }
 
-/* Actions */
 
 .photoflux-navbar-actions {
   flex-shrink: 0;
@@ -231,7 +229,7 @@
   background: #fef2f2;
 }
 
-/* Login and signup */
+
 
 .photoflux-auth-actions {
   display: flex;
@@ -277,7 +275,7 @@
   background: #4338ca;
 }
 
-/* Mobile toggle */
+
 
 .photoflux-menu-button {
   width: 41px;
@@ -291,7 +289,7 @@
   cursor: pointer;
 }
 
-/* Mobile menu */
+
 
 .photoflux-mobile-menu {
   max-height: 0;
@@ -365,7 +363,7 @@
   cursor: pointer;
 }
 
-/* Responsive */
+
 
 @media (max-width: 1180px) {
   .photoflux-nav-link {
@@ -470,4 +468,397 @@
 
 .photoflux-mobile-user:hover {
   color: inherit;
+} */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.photoflux-navbar-wrapper {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.photoflux-pill-navbar {
+  position: relative;
+  width: 100%;
+  max-width: 1380px;
+  min-height: 68px;
+  display: flex;
+  align-items: center;
+  margin: 0 auto;
+  padding: 8px 10px 8px 20px;
+  color: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 999px;
+  background: rgba(15, 15, 17, 0.92);
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+/* Brand */
+
+.photoflux-pill-logo {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 11px;
+  color: #e5e7eb;
+  text-decoration: none;
+}
+
+.photoflux-pill-logo:hover {
+  color: #ffffff;
+}
+
+.photoflux-pill-brand-name {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+}
+
+/* Desktop links */
+
+.photoflux-pill-desktop-links {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  margin-left: 45px;
+}
+
+.photoflux-pill-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #d1d5db;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.25s ease;
+}
+
+.photoflux-pill-link:hover {
+  color: #ffffff;
+}
+
+.photoflux-pill-link-active {
+  color: #ffffff;
+}
+
+.photoflux-link-animation {
+  position: relative;
+  height: 22px;
+  display: block;
+  overflow: hidden;
+}
+
+.photoflux-link-first,
+.photoflux-link-second {
+  display: block;
+  line-height: 22px;
+  transition: transform 0.3s ease;
+}
+
+.photoflux-link-second {
+  position: absolute;
+  top: 100%;
+  left: 0;
+}
+
+.photoflux-pill-link:hover .photoflux-link-first {
+  transform: translateY(-100%);
+}
+
+.photoflux-pill-link:hover .photoflux-link-second {
+  transform: translateY(-100%);
+}
+
+/* Right actions */
+
+.photoflux-pill-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.photoflux-pill-outline-button,
+.photoflux-pill-main-button,
+.photoflux-pill-profile {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 18px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 999px;
+  transition:
+    color 0.25s ease,
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.3s ease,
+    transform 0.25s ease;
+}
+
+.photoflux-pill-outline-button {
+  color: #f8fafc;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background: transparent;
+}
+
+.photoflux-pill-outline-button:hover {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.photoflux-pill-main-button {
+  color: #000000;
+  border: 1px solid #ffffff;
+  background: #ffffff;
+  box-shadow: 0 0 28px 5px rgba(255, 255, 255, 0.2);
+}
+
+.photoflux-pill-main-button:hover {
+  color: #000000;
+  background: #f1f5f9;
+  box-shadow: 0 0 34px 11px rgba(255, 255, 255, 0.34);
+  transform: translateY(-1px);
+}
+
+.photoflux-pill-logout {
+  cursor: pointer;
+}
+
+.photoflux-pill-profile {
+  padding: 4px 12px 4px 5px;
+  color: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.photoflux-pill-profile:hover {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.photoflux-pill-avatar {
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4f46e5, #9333ea);
+}
+
+.photoflux-pill-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Mobile toggle */
+
+.photoflux-pill-menu-button {
+  width: 43px;
+  height: 43px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+}
+
+.photoflux-pill-menu-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Mobile menu */
+
+.photoflux-pill-mobile-menu {
+  width: calc(100% - 32px);
+  max-width: 1380px;
+  max-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 10px auto 0;
+  padding: 0 18px;
+  overflow: hidden;
+  visibility: hidden;
+  opacity: 0;
+  border: 1px solid transparent;
+  border-radius: 24px;
+  background: rgba(10, 10, 12, 0.98);
+  transform: translateY(-12px);
+  transition:
+    max-height 0.35s ease,
+    padding 0.35s ease,
+    opacity 0.25s ease,
+    transform 0.35s ease,
+    visibility 0.35s ease;
+}
+
+.photoflux-pill-mobile-menu-open {
+  max-height: 650px;
+  padding: 18px;
+  visibility: visible;
+  opacity: 1;
+  border-color: rgba(148, 163, 184, 0.3);
+  transform: translateY(0);
+}
+
+.photoflux-pill-mobile-menu .photoflux-pill-link {
+  width: 100%;
+  min-height: 45px;
+  padding: 0 15px;
+  border-radius: 12px;
+}
+
+.photoflux-pill-mobile-menu .photoflux-pill-link:hover,
+.photoflux-pill-mobile-menu .photoflux-pill-link-active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.photoflux-mobile-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 5px 15px;
+  color: #ffffff;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.photoflux-mobile-profile div:last-child {
+  display: flex;
+  flex-direction: column;
+}
+
+.photoflux-mobile-profile strong {
+  font-size: 14px;
+}
+
+.photoflux-mobile-profile span {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.photoflux-mobile-logout-button {
+  min-height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin-top: 8px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  border-radius: 999px;
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.photoflux-mobile-logout-button:hover {
+  background: rgba(239, 68, 68, 0.22);
+}
+
+.photoflux-mobile-auth-buttons {
+  display: grid;
+  gap: 12px;
+}
+
+@media (max-width: 1200px) {
+  .photoflux-pill-desktop-links {
+    gap: 18px;
+    margin-left: 28px;
+  }
+
+  .photoflux-pill-profile span {
+    display: none;
+  }
+
+  .photoflux-pill-profile {
+    padding-right: 5px;
+  }
+}
+
+@media (max-width: 991px) {
+  .photoflux-pill-desktop-links {
+    display: none;
+  }
+
+  .photoflux-pill-actions
+    > .photoflux-pill-outline-button,
+  .photoflux-pill-actions
+    > .photoflux-pill-main-button,
+  .photoflux-pill-actions
+    > .photoflux-pill-profile {
+    display: none;
+  }
+
+  .photoflux-pill-menu-button {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 576px) {
+  .photoflux-navbar-wrapper {
+    padding: 10px;
+  }
+
+  .photoflux-pill-navbar {
+    min-height: 61px;
+    padding: 7px 8px 7px 14px;
+  }
+
+  .photoflux-pill-brand-name {
+    font-size: 15px;
+  }
+
+  .photoflux-pill-logo svg {
+    width: 29px;
+    height: 29px;
+  }
+
+  .photoflux-pill-mobile-menu {
+    width: calc(100% - 20px);
+  }
 }
