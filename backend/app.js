@@ -125,9 +125,7 @@ app.use('/api/posts', commentRoutes);
 
 
 
-
 app.use("/api", chatbotRoutes);
-
 
 
 app.use("/follow", followRoutes);
