@@ -415,7 +415,7 @@ const LocalUserSearch = () => {
         setError("");
 
         const [usersResponse, followingResponse] = await Promise.all([
-          axios.get(`${apiUrl}/api/users`, {
+          axios.get(`${apiUrl}/api/users/${currentUsername}`, {
             headers,
           }),
 
