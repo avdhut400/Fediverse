@@ -94,7 +94,8 @@ app.use(
 // };
 
 
-const replyRoutes = require("./routes/replyRoutes");
+// const replyRoutes = require("./routes/replyRoutes");
+
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const postRoutes = require('./routes/postRoutes');
@@ -103,7 +104,7 @@ const feedRoutes = require("./routes/feedRoutes");
 const followRoutes = require("./routes/followRoutes");
 // const auth=require("./routes/auth");
 const commentRoutes = require('./routes/comments');
-
+const chatbotRoutes = require('./routes/chat');
 
 app.use(express.json({ type: ['application/json', 'application/activity+json'] }));
 
@@ -119,11 +120,13 @@ app.use(express.urlencoded({ extended: true }));
 
 
 
-app.use("/replies", replyRoutes);
+// app.use("/replies", replyRoutes);
 app.use('/api/posts', commentRoutes);
 
 
 
+
+app.use("/api", chatbotRoutes);
 
 
 

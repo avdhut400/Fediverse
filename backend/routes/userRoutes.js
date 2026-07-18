@@ -11,7 +11,7 @@ const {
   getMyProfile,
   updateProfilePicture,
   removeProfilePicture,
-
+  updateBio
 } = require("../controllers/userController");
 
 const { verifyToken } = require("../middleware/authMiddleware");
@@ -23,14 +23,20 @@ const upload = multer({ storage });
 
 
 
-router.get("/", getAllUsers);
+// router.get("/", getAllUsers);
+router.get("/:username", getAllUsers);
+
 router.get("/:id", getUserById);
 router.post("/:username/follow", verifyToken, followUser);
 router.post("/:username/unfollow", verifyToken, unfollowUser);
 router.get("/:username/posts", getUserPosts);
 
 
-
+router.put(
+  "/me/bio",
+  verifyToken,
+  updateBio
+);
 
 
 

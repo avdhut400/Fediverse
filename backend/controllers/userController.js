@@ -11,10 +11,12 @@ const signRequest = require("../utils/httpSignature");
 
 // controllers/userController.js
 exports.getAllUsers = async (req, res) => {
-  const currentUsername = req.query.currentUser;
+  // const currentUsername = req.query.currentUser;
+  const currentUsername = req.params.username; 
+  
 
   try {
-    const users = await User.find({ username: { $ne: currentUsername } }).select("username displayName");
+    const users = await User.find({ username: { $ne: currentUsername } }).select("username profilePic");
     res.json(users);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch users" });
@@ -173,7 +175,7 @@ exports.getMyProfile = async (req, res) => {
     console.error("Get profile error:", error);
 
     return res.status(500).json({
-      message: "Failed to load profile",
+      message: "Failed to load profile", 
     });
   }
 };
@@ -283,6 +285,78 @@ exports.removeProfilePicture = async (req, res) => {
     });
   }
 };
+
+
+
+
+
+
+
+
+
+exports.updateBio = async (req, res) => {
+  try {
+    const userId = (
+      req.user?.id ||
+      req.user?._id
+    )?.toString();
+
+    const { bio } = req.body;
+
+    if (typeof bio !== "string") {
+      return res.status(400).json({
+        error: "Bio must be a string.",
+      });
+    }
+
+    if (bio.trim().length > 160) {
+      return res.status(400).json({
+        error: "Bio cannot exceed 160 characters.",
+      });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      {
+        bio: bio.trim(),
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    ).select("-password -privateKey");
+
+    if (!user) {
+      return res.status(404).json({
+        error: "User not found.",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Bio updated successfully.",
+      user,
+    });
+  } catch (err) {
+    console.error("Error updating bio:", err);
+
+    return res.status(500).json({
+      error: "Server error.",
+    });
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // module.exports = {

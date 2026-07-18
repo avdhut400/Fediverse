@@ -1,0 +1,60 @@
+const express = require("express");
+const axios = require("axios");
+
+const router = express.Router();
+const chatbotContext = require("../config/contex");
+router.post("/chat", async (req, res) => {
+  const { message } = req.body;
+
+  if (!message) {
+    return res.status(400).json({
+      error: "Message required"
+    });
+  }
+
+  try {
+    const appContext = `${chatbotContext}`;
+
+    const response = await axios.post(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      {
+        contents: [
+          {
+            role: "user",
+            parts: [
+              {
+                text: `${appContext}
+
+User question:
+${message}`
+              }
+            ]
+          }
+        ]
+      },
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    const reply =
+      response.data.candidates?.[0]?.content?.parts?.[0]?.text ||
+      "Sorry, I could not generate a response.";
+
+    return res.status(200).json({ reply });
+
+  } catch (error) {
+    console.error(
+      "Gemini Error:",
+      error.response?.data || error.message
+    );
+
+    return res.status(500).json({
+      error: "Failed to generate chatbot response"
+    });
+  }
+});
+
+module.exports = router;
