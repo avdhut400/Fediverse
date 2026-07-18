@@ -48,6 +48,7 @@ Photoflux explores the future of decentralized social media using:
 - Public feed via ActivityPub Outbox  
 
 ---
+<img width="1862" height="903" alt="image" src="https://github.com/user-attachments/assets/1c03124d-13f6-41b9-af15-798321156b15" />
 <img width="1901" height="927" alt="Screenshot 2026-07-16 174018" src="https://github.com/user-attachments/assets/0698f286-ec61-4d54-8e0b-7525b4ed8f48" />
 <img width="1890" height="905" alt="Screenshot 2026-07-16 174059" src="https://github.com/user-attachments/assets/75c87ea0-49be-4947-93e2-29fb5f1191d3" />
 <img width="1887" height="912" alt="Screenshot 2026-07-16 174155" src="https://github.com/user-attachments/assets/75e4e564-e783-4b57-a09d-1d5564ef409a" />
