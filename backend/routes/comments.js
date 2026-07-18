@@ -12,5 +12,16 @@ console.log("typeof getCommentsByPost:", typeof commentController.getCommentsByP
 
 router.post('/:postId/comment', authMiddleware, commentController.createComment);
 router.get('/:postId/comment', commentController.getCommentsByPost);
+router.delete(
+  "/:postId/comments/:commentId",
+  authMiddleware,
+  commentController.deleteComment
+);
+
+router.put(
+  "/:commentId",
+  authMiddleware,
+  commentController.updateComment
+);
 
 module.exports = router;

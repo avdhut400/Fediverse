@@ -16,6 +16,8 @@ import UserOutboxPage from "./Pages/UserOutboxPage";
 // import FeedPage from "./Pages/Feed";
 import LocalUserSearch from "./Pages/LocalUserSearch";
 import Home from "./Pages/home";
+
+import Chatbot from "./components/Chatbot";
 import Footer from "./components/Footer";
 function App() {
   return (
@@ -38,6 +40,7 @@ function App() {
             <Route path="/users/:username/outbox" element={< UserOutboxPage />} />
           </Routes>
         </main>
+        <Chatbot />
         <Footer />
       </div>
     </Router>

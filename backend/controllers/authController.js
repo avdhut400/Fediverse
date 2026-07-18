@@ -109,21 +109,21 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   const { username, password } = req.body;
 
-  // console.log("📥 Login attempt:", username, password);
+  // console.log(" Login attempt:", username, password);
 
   const user = await User.findOne({ username }).select("+password +privateKey");
-  // console.log("👤 Found user from DB:", user);
+  // console.log(" Found user from DB:", user);
 
   if (!user || !user.password) {
-    // console.log("❌ User not found or password missing");
+    // console.log(" User not found or password missing");
     return res.status(401).json({ error: "Invalid credentials" });
   }
 
   const isMatch = await user.comparePassword(password);
-  // console.log("🔐 Password match result:", isMatch);
+  // console.log(" Password match result:", isMatch);
 
   if (!isMatch) {
-    // console.log("❌ Password did not match");
+    // console.log(" Password did not match");
     return res.status(401).json({ error: "Invalid credentials" });
   }
 

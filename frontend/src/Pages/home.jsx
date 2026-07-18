@@ -446,7 +446,7 @@ const Dashboard = () => {
           </div>
 
           <Link
-            to={`/users/${username}`}
+            to={`/followers/${username}`}
             className="dashboard-profile-button"
           >
             <FaUser />

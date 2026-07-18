@@ -10,7 +10,6 @@ const fetchInboxUrl = require("../utils/fetchInboxUrl");
 const {sendSignedRequest} = require("../utils/sendSignedRequest");
 
 const publicKey = fs.readFileSync(path.join(__dirname, '../public.pem'), 'utf8');
- 
 exports.webfinger = async (req, res) => {
   console.log("📡 Webfinger called with:", req.query.resource);
   
@@ -18,11 +17,11 @@ exports.webfinger = async (req, res) => {
   const username = resource?.split(":")[1]?.split("@")[0];
   const host = req.headers.host;
 
-  console.log("🔍 Extracted username:", username, "from host:", host);
+  console.log(" Extracted username:", username, "from host:", host);
 
   const user = await User.findOne({ username });
   if (!user) {
-    console.log("❌ User not found:", username);
+    console.log(" User not found:", username);
     return res.status(404).json({ error: "User not found" });
   }
 
@@ -57,6 +56,7 @@ exports.actor = async (req, res) => {
   }
 
   console.log("✅ User found:", user.username);
+  console.log("✅ User found:", user.bio);
 
   res.setHeader("Content-Type", "application/activity+json");
   return res.json({
@@ -64,6 +64,8 @@ exports.actor = async (req, res) => {
     id: `${process.env.BASE_URL}/users/${username}`,
     type: "Person",
     preferredUsername: username,
+    summary: user.bio || "",
+
     inbox: `${process.env.BASE_URL}/users/${username}/inbox`,
     outbox: `${process.env.BASE_URL}/users/${username}/outbox`,
     followers: `${process.env.BASE_URL}/users/${username}/followers`,
