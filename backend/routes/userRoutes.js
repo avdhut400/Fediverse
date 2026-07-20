@@ -21,7 +21,30 @@ const User = require("../models/User");
 
 const upload = multer({ storage });
 
+router.get(
+  "/me",
+  verifyToken,
+  getMyProfile
+);
 
+router.put(
+  "/me/profile-picture",
+  verifyToken,
+  upload.single("profilePic"),
+  updateProfilePicture
+);
+
+router.delete(
+  "/me/profile-picture",
+  verifyToken,
+  removeProfilePicture
+);
+
+router.put(
+  "/me/bio",
+  verifyToken,
+  updateBio
+);
 
 // router.get("/", getAllUsers);
 router.get("/:username", getAllUsers);
@@ -32,11 +55,11 @@ router.post("/:username/unfollow", verifyToken, unfollowUser);
 router.get("/:username/posts", getUserPosts);
 
 
-router.put(
-  "/me/bio",
-  verifyToken,
-  updateBio
-);
+// router.put(
+//   "/me/bio",
+//   verifyToken,
+//   updateBio
+// );
 
 
 
@@ -156,20 +179,6 @@ router.delete("/:username/following/:followingUsername", async (req, res) => {
 });
 
 
-// router.get("/me", verifyToken, getMyProfile);
-
-router.put(
-  "/me/profile-picture",
-  verifyToken,
-  upload.single("profilePic"),
-  updateProfilePicture
-);
-
-// router.delete(
-//   "/me/profile-picture",
-//   verifyToken,
-//   removeProfilePicture
-// );
 
 
 
