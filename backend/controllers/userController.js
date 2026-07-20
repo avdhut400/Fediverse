@@ -180,16 +180,70 @@ exports.getMyProfile = async (req, res) => {
   }
 };
 
-// /*
-//  * SET or UPDATE profile picture
-//  */
 
-exports.updateProfilePicture = async (req, res) => {
+
+const getUserId = (req) => {
+  return (
+    req.user?.id ||
+    req.user?._id ||
+    req.user?.userId ||
+    null
+  );
+};
+
+exports.getMyProfile = async (req, res) => {
   try {
-    const userId =
-      req.user?._id ||
-      req.user?.id ||
-      req.user?.userId;
+    const userId = getUserId(req);
+
+    if (!userId) {
+      return res.status(401).json({
+        message: "Unauthorized user",
+      });
+    }
+
+    const user = await User.findById(userId).select(
+      "username email bio profilePic actorUrl followers following"
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json({
+      user: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        bio: user.bio || "",
+        profilePic: user.profilePic || {
+          url: "",
+          filename: "",
+        },
+        actorUrl: user.actorUrl,
+        followers: user.followers,
+        following: user.following,
+      },
+    });
+  } catch (error) {
+    console.error(
+      "Get profile error:",
+      error
+    );
+
+    return res.status(500).json({
+      message: "Failed to fetch profile",
+    });
+  }
+};
+
+exports.updateProfilePicture = async (
+  req,
+  res
+) => {
+  try {
+    const userId = getUserId(req);
 
     if (!userId) {
       return res.status(401).json({
@@ -207,28 +261,78 @@ exports.updateProfilePicture = async (req, res) => {
     const user = await User.findById(userId);
 
     if (!user) {
+      if (req.file.filename) {
+        await cloudinary.uploader.destroy(
+          req.file.filename
+        );
+      }
+
       return res.status(404).json({
         message: "User not found",
       });
     }
 
+    const oldProfileFilename =
+      user.profilePic?.filename;
+
     user.profilePic = {
-      url: req.file.path,
-      filename: req.file.filename,
+      url:
+        req.file.path ||
+        req.file.secure_url ||
+        "",
+      filename:
+        req.file.filename ||
+        req.file.public_id ||
+        "",
     };
 
     await user.save();
+
+    if (
+      oldProfileFilename &&
+      oldProfileFilename !==
+        user.profilePic.filename
+    ) {
+      try {
+        await cloudinary.uploader.destroy(
+          oldProfileFilename
+        );
+      } catch (cloudinaryError) {
+        console.error(
+          "Old profile picture deletion failed:",
+          cloudinaryError.message
+        );
+      }
+    }
 
     return res.status(200).json({
       message:
         "Profile picture updated successfully",
       profilePic: user.profilePic,
+      user: {
+        _id: user._id,
+        username: user.username,
+        profilePic: user.profilePic,
+      },
     });
   } catch (error) {
     console.error(
-      "Profile update error:",
+      "Profile picture update error:",
       error
     );
+
+    if (req.file?.filename) {
+      try {
+        await cloudinary.uploader.destroy(
+          req.file.filename
+        );
+      } catch (cleanupError) {
+        console.error(
+          "Uploaded image cleanup failed:",
+          cleanupError.message
+        );
+      }
+    }
 
     return res.status(500).json({
       message:
@@ -237,13 +341,19 @@ exports.updateProfilePicture = async (req, res) => {
     });
   }
 };
-// /*
-//  * REMOVE profile picture
-//  */
 
-exports.removeProfilePicture = async (req, res) => {
+exports.removeProfilePicture = async (
+  req,
+  res
+) => {
   try {
-    const userId = req.user?.id || req.user?._id;
+    const userId = getUserId(req);
+
+    if (!userId) {
+      return res.status(401).json({
+        message: "Unauthorized user",
+      });
+    }
 
     const user = await User.findById(userId);
 
@@ -253,15 +363,18 @@ exports.removeProfilePicture = async (req, res) => {
       });
     }
 
-    if (user.profilePic?.filename) {
+    const profileFilename =
+      user.profilePic?.filename;
+
+    if (profileFilename) {
       try {
         await cloudinary.uploader.destroy(
-          user.profilePic.filename
+          profileFilename
         );
       } catch (cloudinaryError) {
         console.error(
           "Cloudinary image deletion failed:",
-          cloudinaryError
+          cloudinaryError.message
         );
       }
     }
@@ -274,34 +387,33 @@ exports.removeProfilePicture = async (req, res) => {
     await user.save();
 
     return res.status(200).json({
-      message: "Profile picture removed successfully",
+      message:
+        "Profile picture removed successfully",
       profilePic: user.profilePic,
     });
   } catch (error) {
-    console.error("Remove profile picture error:", error);
+    console.error(
+      "Remove profile picture error:",
+      error
+    );
 
     return res.status(500).json({
-      message: "Failed to remove profile picture",
+      message:
+        "Failed to remove profile picture",
     });
   }
 };
 
-
-
-
-
-
-
-
-
 exports.updateBio = async (req, res) => {
   try {
-    const userId = (
-      req.user?.id ||
-      req.user?._id
-    )?.toString();
-
+    const userId = getUserId(req);
     const { bio } = req.body;
+
+    if (!userId) {
+      return res.status(401).json({
+        error: "Unauthorized user.",
+      });
+    }
 
     if (typeof bio !== "string") {
       return res.status(400).json({
@@ -311,20 +423,24 @@ exports.updateBio = async (req, res) => {
 
     if (bio.trim().length > 160) {
       return res.status(400).json({
-        error: "Bio cannot exceed 160 characters.",
+        error:
+          "Bio cannot exceed 160 characters.",
       });
     }
 
-    const user = await User.findByIdAndUpdate(
-      userId,
-      {
-        bio: bio.trim(),
-      },
-      {
-        new: true,
-        runValidators: true,
-      }
-    ).select("-password -privateKey");
+    const user =
+      await User.findByIdAndUpdate(
+        userId,
+        {
+          bio: bio.trim(),
+        },
+        {
+          new: true,
+          runValidators: true,
+        }
+      ).select(
+        "username email bio profilePic actorUrl"
+      );
 
     if (!user) {
       return res.status(404).json({
@@ -333,33 +449,18 @@ exports.updateBio = async (req, res) => {
     }
 
     return res.status(200).json({
-      message: "Bio updated successfully.",
+      message:
+        "Bio updated successfully.",
       user,
     });
-  } catch (err) {
-    console.error("Error updating bio:", err);
+  } catch (error) {
+    console.error(
+      "Error updating bio:",
+      error
+    );
 
     return res.status(500).json({
       error: "Server error.",
     });
   }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// module.exports = {
-//   updateProfilePicture,
-//   removeProfilePicture
-// };

@@ -43,7 +43,7 @@ exports.getFeed = async (req, res) => {
         .sort({ createdAt: -1 })
         .populate({
           path: 'author',
-          select: 'username displayName avatar',
+          select: 'username displayName avatar profilePic bio',
           model: 'User'
         })
         .lean(); // Convert to plain JS objects

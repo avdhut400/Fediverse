@@ -25,7 +25,7 @@ const sendGreetingEmail=require("./mail")
 //   });
 //   sendGreetingEmail(email, username)
 //   .then(() => console.log("Welcome email sent"))
-//   .catch((err) => console.error("❌ Failed to send greeting email:", err));
+//   .catch((err) => console.error( Failed to send greeting email:", err));
 
 //   res.status(201).json({ message: "User created" });
 // };
@@ -63,10 +63,10 @@ exports.register = async (req, res) => {
 
     try {
       await sendGreetingEmail(email, username);
-      console.log("✅ Welcome email sent");
+      console.log("Welcome email sent");
     } catch (mailError) {
       console.error(
-        "❌ Failed to send greeting email:",
+        " Failed to send greeting email:",
         mailError.message
       );
 
