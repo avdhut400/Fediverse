@@ -19,6 +19,8 @@ import Home from "./Pages/home";
 
 import Chatbot from "./components/Chatbot";
 import Footer from "./components/Footer";
+import ForgotPassword from "./Pages/ForgotPassword";
+import ResetPassword from "./Pages/ResetPassword";
 function App() {
   return (
     <Router>
@@ -38,6 +40,8 @@ function App() {
             <Route path="/remote-search" element={<RemoteSearch />} />
             <Route path="/local-users" element={<LocalUserSearch />} />
             <Route path="/users/:username/outbox" element={< UserOutboxPage />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
           </Routes>
         </main>
         <Chatbot />
