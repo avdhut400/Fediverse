@@ -57,6 +57,15 @@ const userSchema = new mongoose.Schema(
       default: "",
       maxlength: 160,
     },
+    passwordResetToken: {
+      type: String,
+      select: false,
+    },
+
+    passwordResetExpires: {
+      type: Date,
+      select: false,
+    },
   },
   {
     timestamps: true,
@@ -101,7 +110,7 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.methods.comparePassword = async function (candidatePassword) {
-  console.log("🧪 Comparing:", candidatePassword, "↔️", this.password);
+  console.log(" Comparing:", candidatePassword, "↔️", this.password);
   return await bcrypt.compare(candidatePassword, this.password);
 };
 module.exports = mongoose.model(
