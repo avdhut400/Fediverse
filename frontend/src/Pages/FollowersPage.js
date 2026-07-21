@@ -1,5 +1,4 @@
 
-
 import React, {
   useCallback,
   useEffect,
@@ -37,7 +36,6 @@ const FollowersPage = () => {
     useState("");
 
   const [profilePic, setProfilePic] = useState("");
-  const [profileLoading, setProfileLoading] = useState(false);
   const [bio, setBio] = useState("");
   const [bioDraft, setBioDraft] = useState("");
   const [editingBio, setEditingBio] = useState(false);
@@ -70,23 +68,6 @@ const FollowersPage = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("token");
 
-  const loggedInUsername = useMemo(() => {
-    try {
-      if (token) {
-        const decoded = jwtDecode(token);
-        return (
-          decoded?.username ||
-          localStorage.getItem("username") ||
-          ""
-        );
-      }
-    } catch (decodeError) {
-      console.error("[ProfileDebug] Token decode error:", decodeError);
-    }
-
-    return localStorage.getItem("username") || "";
-  }, [token]);
-
   const headers = useMemo(
     () => ({
       Authorization: token
@@ -101,6 +82,24 @@ const FollowersPage = () => {
   );
 
   
+  const addCacheBuster = useCallback((url) => {
+    if (!url) return "";
+
+    const cleanUrl = String(url)
+      .replace(
+        /([?&])v=\d+(&|$)/,
+        "$1"
+      )
+      .replace(/[?&]$/, "");
+
+    const separator = cleanUrl.includes("?")
+      ? "&"
+      : "?";
+
+    return `${cleanUrl}${separator}v=${Date.now()}`;
+  }, []);
+
+  
   const getProfilePictureUrl = useCallback((data) => {
     return (
       data?.profilePic?.url ||
@@ -112,9 +111,33 @@ const FollowersPage = () => {
     );
   }, []);
 
+  
   useEffect(() => {
-    setCurrentUsername(loggedInUsername);
-  }, [loggedInUsername]);
+    try {
+      if (token) {
+        const decoded = jwtDecode(token);
+
+        setCurrentUsername(
+          decoded.username ||
+            localStorage.getItem("username") ||
+            ""
+        );
+      } else {
+        setCurrentUsername(
+          localStorage.getItem("username") || ""
+        );
+      }
+    } catch (decodeError) {
+      console.error(
+        "Token decode error:",
+        decodeError
+      );
+
+      setCurrentUsername(
+        localStorage.getItem("username") || ""
+      );
+    }
+  }, [token]);
 
   
   useEffect(() => {
@@ -283,48 +306,50 @@ const FollowersPage = () => {
   const fetchProfilePicture = useCallback(async () => {
     if (!username || !apiUrl) return;
 
-    const ownProfile =
-      Boolean(token) &&
-      loggedInUsername.toLowerCase() ===
-        username.toLowerCase();
-
-    const endpoint = ownProfile
-      ? `${apiUrl}/api/users/me`
-      : `${apiUrl}/users/${username}`;
-
-    console.log("[ProfileDebug] refresh fetch:", {
-      routeUsername: username,
-      loggedInUsername,
-      ownProfile,
-      endpoint,
-    });
+    const loggedUsername =
+      localStorage.getItem("username") ||
+      "";
 
     try {
-      setProfileLoading(true);
+      let response;
 
-      const response = await axios.get(endpoint, {
-        headers: ownProfile
-          ? {
-              Authorization: `Bearer ${token}`,
-              "ngrok-skip-browser-warning": "true",
-            }
-          : {
-              Accept: "application/activity+json",
-              "ngrok-skip-browser-warning": "true",
+    
+      if (
+        token &&
+        loggedUsername === username
+      ) {
+        response = await axios.get(
+          `${apiUrl}/api/users/me`,
+          {
+            headers: {
+              Authorization:
+                `Bearer ${token}`,
+
+              "ngrok-skip-browser-warning":
+                "true",
             },
-      });
+          }
+        );
+      } else {
+        
+        response = await axios.get(
+          `${apiUrl}/users/${username}`,
+          {
+            headers: {
+              Accept:
+                "application/activity+json",
 
-      console.log(
-        "[ProfileDebug] profile response:",
-        JSON.stringify(response.data, null, 2)
-      );
+              "ngrok-skip-browser-warning":
+                "true",
+            },
+          }
+        );
+      }
 
-      const permanentUrl = getProfilePictureUrl(response.data);
-
-      console.log(
-        "[ProfileDebug] extracted profile URL:",
-        permanentUrl
-      );
+      const permanentUrl =
+        getProfilePictureUrl(
+          response.data
+        );
 
       const profileBio =
         response.data?.bio ||
@@ -337,50 +362,49 @@ const FollowersPage = () => {
       setBioDraft(profileBio);
 
       if (permanentUrl) {
-        setProfilePic(permanentUrl);
-
-        if (ownProfile) {
-          localStorage.setItem("profilePic", permanentUrl);
-        }
-      } else {
-        console.error(
-          "[ProfileDebug] profile URL missing:",
-          response.data
+        setProfilePic(
+          addCacheBuster(permanentUrl)
         );
 
-        if (ownProfile) {
-          setProfilePic(
-            localStorage.getItem("profilePic") || ""
+        if (
+          loggedUsername === username
+        ) {
+          localStorage.setItem(
+            "profilePic",
+            permanentUrl
           );
-        } else {
-          setProfilePic("");
         }
+      } else {
+        setProfilePic("");
       }
     } catch (requestError) {
       console.error(
-        "[ProfileDebug] profile fetch failed:",
+        "Profile picture fetch failed:",
         requestError.response?.data ||
           requestError.message
       );
 
-      if (ownProfile) {
-        setProfilePic(
-          localStorage.getItem("profilePic") || ""
-        );
-      } else {
-        setProfilePic("");
-      }
-    } finally {
-      setProfileLoading(false);
-    }
-  }, [
-    username,
-    apiUrl,
-    token,
-    loggedInUsername,
-    getProfilePictureUrl,
-  ]);
+      
+      if (
+        loggedUsername === username
+      ) {
+        const storedProfilePic =
+          localStorage.getItem(
+            "profilePic"
+          );
 
+        setProfilePic(
+          storedProfilePic
+            ? addCacheBuster(
+                storedProfilePic
+              )
+            : ""
+        );
+      }
+    }
+  }, [username, apiUrl, token, addCacheBuster, getProfilePictureUrl]);
+
+  
   const fetchData = useCallback(async () => {
     if (!username || !apiUrl) {
       setError(
@@ -765,7 +789,11 @@ const FollowersPage = () => {
         }
 
         
-        setProfilePic(permanentUrl);
+        setProfilePic(
+          addCacheBuster(
+            permanentUrl
+          )
+        );
 
         localStorage.setItem(
           "profilePic",
@@ -863,8 +891,7 @@ const FollowersPage = () => {
 
   const isOwnProfile =
     Boolean(currentUsername) &&
-    currentUsername.toLowerCase() ===
-      username?.toLowerCase();
+    currentUsername === username;
 
   const displayedUsers =
     view === "followers"
@@ -900,24 +927,21 @@ const FollowersPage = () => {
               <img
                 src={profilePic}
                 alt={`${username} profile`}
-                onLoad={() => {
-                  console.log(
-                    "[ProfileDebug] image loaded:",
-                    profilePic
-                  );
-                }}
-                onError={(event) => {
-                  const failedUrl =
-                    event.currentTarget.src;
+                onError={() => {
+                  const storedProfilePic =
+                    localStorage.getItem(
+                      "profilePic"
+                    );
 
-                  console.error(
-                    "[ProfileDebug] image failed to load:",
-                    failedUrl
-                  );
-
-                  event.currentTarget.onerror = null;
-
-                  if (failedUrl === profilePic) {
+                  if (
+                    storedProfilePic
+                  ) {
+                    setProfilePic(
+                      addCacheBuster(
+                        storedProfilePic
+                      )
+                    );
+                  } else {
                     setProfilePic("");
                   }
                 }}
@@ -1199,7 +1223,6 @@ const FollowersPage = () => {
                       </div>
 
                       <div className="connection-actions">
-
                         {connectionUser.profileUrl && (
                           connectionUser.domain === "fediverse.onrender.com" ? (
                             <Link
@@ -1220,18 +1243,6 @@ const FollowersPage = () => {
                               View
                             </a>
                           )
-
-                        {connectionUser.username && (
-                          <Link
-                            to={`/followers/${encodeURIComponent(
-                              connectionUser.username
-                            )}`}
-                            className="connection-view-button"
-                          >
-                            <FaExternalLinkAlt />
-                            View
-                          </Link>
-
                         )}
 
                         {isOwnProfile &&
