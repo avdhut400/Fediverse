@@ -76,65 +76,213 @@ exports.followUser = async (req, res) => {
 
 
 
+// exports.unfollowUser = async (req, res) => {
+//   const targetUsername = req.params.username;
+//   const currentUserId = req.user.id;
+
+//   try {
+//     const targetUser = await User.findOne({ username: targetUsername });
+//     const currentUser = await User.findById(currentUserId);
+
+//     if (!targetUser || !currentUser) {
+//       return res.status(404).json({ error: "User not found" });
+//     }
+
+//     const currentActor = currentUser.actorUrl;
+//     const targetActor = targetUser.actorUrl;
+
+//     // Remove from following
+//     currentUser.following = currentUser.following.filter(
+//       (actor) => actor !== targetActor
+//     );
+//     await currentUser.save();
+
+//     // Remove from followers
+//     targetUser.followers = targetUser.followers.filter(
+//       (actor) => actor !== currentActor
+//     );
+//     await targetUser.save();
+
+//     // If target is remote, send Undo Follow
+//     if (targetActor.startsWith("http") && !targetActor.includes(process.env.BASE_URL)) {
+//       const undoActivity = {
+//         "@context": "https://www.w3.org/ns/activitystreams",
+//         id: `${currentActor}/undo/${crypto.randomUUID()}`,
+//         type: "Undo",
+//         actor: currentActor,
+//         object: {
+//           type: "Follow",
+//           actor: currentActor,
+//           object: targetActor
+//         }
+//       };
+
+//       const inboxUrl = targetActor + "/inbox";
+
+//       const headers = signRequest({
+//         actor: currentActor,
+//         inboxUrl,
+//         body: undoActivity
+//       });
+
+//       await axios.post(inboxUrl, undoActivity, { headers });
+//       console.log(`Sent Undo follow to ${inboxUrl}`);
+//     }
+
+//     res.status(200).json({ message: "Unfollowed successfully" });
+//   } catch (err) {
+//     console.error("Unfollow error:", err.message);
+//     res.status(500).json({ error: "Failed to unfollow user" });
+//   }
+// };
+
+
+
+
 exports.unfollowUser = async (req, res) => {
-  const targetUsername = req.params.username;
-  const currentUserId = req.user.id;
-
   try {
-    const targetUser = await User.findOne({ username: targetUsername });
-    const currentUser = await User.findById(currentUserId);
+    const currentUsername = req.params.username;
+    const targetUsername = req.params.followingUsername;
 
-    if (!targetUser || !currentUser) {
-      return res.status(404).json({ error: "User not found" });
+    const currentUser = await User.findOne({
+      username: currentUsername,
+    });
+
+    const targetUser = await User.findOne({
+      username: targetUsername,
+    });
+
+    if (!currentUser || !targetUser) {
+      return res.status(404).json({
+        error: "User not found",
+      });
     }
 
-    const currentActor = currentUser.actorUrl;
-    const targetActor = targetUser.actorUrl;
-
-    // Remove from following
     currentUser.following = currentUser.following.filter(
-      (actor) => actor !== targetActor
+      (actorUrl) => actorUrl !== targetUser.actorUrl
     );
-    await currentUser.save();
 
-    // Remove from followers
     targetUser.followers = targetUser.followers.filter(
-      (actor) => actor !== currentActor
+      (actorUrl) => actorUrl !== currentUser.actorUrl
     );
+
+    await currentUser.save();
     await targetUser.save();
 
-    // If target is remote, send Undo Follow
-    if (targetActor.startsWith("http") && !targetActor.includes(process.env.BASE_URL)) {
-      const undoActivity = {
-        "@context": "https://www.w3.org/ns/activitystreams",
-        id: `${currentActor}/undo/${crypto.randomUUID()}`,
-        type: "Undo",
-        actor: currentActor,
-        object: {
-          type: "Follow",
-          actor: currentActor,
-          object: targetActor
-        }
-      };
-
-      const inboxUrl = targetActor + "/inbox";
-
-      const headers = signRequest({
-        actor: currentActor,
-        inboxUrl,
-        body: undoActivity
-      });
-
-      await axios.post(inboxUrl, undoActivity, { headers });
-      console.log(`Sent Undo follow to ${inboxUrl}`);
-    }
-
-    res.status(200).json({ message: "Unfollowed successfully" });
+    return res.status(200).json({
+      message: "Unfollowed successfully",
+      following: currentUser.following,
+    });
   } catch (err) {
-    console.error("Unfollow error:", err.message);
-    res.status(500).json({ error: "Failed to unfollow user" });
+    console.error("Unfollow error:", err);
+
+    return res.status(500).json({
+      error: "Failed to unfollow user",
+    });
   }
 };
+
+
+
+exports.removeFollower = async (req, res) => {
+  try {
+    const currentUsername = req.params.username;
+    const followerUsername = req.params.followerUsername;
+
+    const currentUser = await User.findOne({
+      username: currentUsername,
+    });
+
+    const followerUser = await User.findOne({
+      username: followerUsername,
+    });
+
+    if (!currentUser || !followerUser) {
+      return res.status(404).json({
+        error: "User not found",
+      });
+    }
+
+    currentUser.followers = currentUser.followers.filter(
+      (actorUrl) => actorUrl !== followerUser.actorUrl
+    );
+
+    followerUser.following = followerUser.following.filter(
+      (actorUrl) => actorUrl !== currentUser.actorUrl
+    );
+
+    await currentUser.save();
+    await followerUser.save();
+
+    return res.status(200).json({
+      message: "Follower removed successfully",
+      followers: currentUser.followers,
+    });
+  } catch (err) {
+    console.error("Remove follower error:", err);
+
+    return res.status(500).json({
+      error: "Failed to remove follower",
+    });
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -461,6 +609,36 @@ exports.updateBio = async (req, res) => {
 
     return res.status(500).json({
       error: "Server error.",
+    });
+  }
+};
+
+
+
+
+
+
+
+exports.getUserProfileByUsername = async (req, res) => {
+  try {
+    const { username } = req.params;
+
+    const user = await User.findOne({ username }).select(
+      "username displayName bio profilePic avatar actorUrl"
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        error: "User not found",
+      });
+    }
+
+    return res.status(200).json(user);
+  } catch (error) {
+    console.error("Failed to fetch user profile:", error);
+
+    return res.status(500).json({
+      error: "Server error",
     });
   }
 };
