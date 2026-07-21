@@ -357,7 +357,8 @@ function Login() {
                     to="/forgot-password"
                     className="text-primary fw-semibold text-decoration-none small"
                   >
-                    Forgot password?
+                    Forgot password? Password reset email may not be delivered on the live demo due to hosting limitations. Please contact the developer for assistance.
+
                   </Link>
                 </div>
 
