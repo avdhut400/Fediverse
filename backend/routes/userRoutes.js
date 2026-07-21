@@ -12,7 +12,8 @@ const {
   updateProfilePicture,
   removeProfilePicture,
   updateBio,
-  removeFollower
+  removeFollower,
+  getUserProfileByUsername
 } = require("../controllers/userController");
 
 const { verifyToken } = require("../middleware/authMiddleware");
@@ -27,6 +28,9 @@ router.get(
   verifyToken,
   getMyProfile
 );
+
+
+
 
 router.put(
   "/me/profile-picture",
