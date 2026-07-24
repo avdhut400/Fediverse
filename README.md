@@ -121,6 +121,12 @@ npm install
 npm run dev
  
 ```
+## Database Schema
+
+The database schema for this project was designed using **dbdiagram.io** and represents the MongoDB collections and their logical relationships.
+
+🔗 **View Database Schema:** https://dbdiagram.io/d/6a630c32c3a90dd98da8747d
+
 ---
 ### ActivityPub Endpoints
 WebFinger: /.well-known/webfinger
