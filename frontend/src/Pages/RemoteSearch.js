@@ -49,7 +49,8 @@ const RemoteSearch = () => {
       );
 
       const selfLink = webfingerRes.data.links?.find(
-        (link) => link.rel === "self"
+        (link) => link.rel === "self"             &&
+                                                      link.type === "application/activity+json"
       );
 
       if (!selfLink?.href) {
