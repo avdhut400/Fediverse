@@ -45,4 +45,60 @@ function signRequest({ inboxUrl, actor, body }) {
   };
 }
 
-module.exports = signRequest;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function signGetRequest({ targetUrl, actor }) {
+  const parsed = url.parse(targetUrl);
+  const date = new Date().toUTCString();
+
+  const stringToSign = [
+    `(request-target): get ${parsed.path}`,
+    `host: ${parsed.host}`,
+    `date: ${date}`,
+  ].join("\n");
+
+  console.log("🔐 GET String to Sign:");
+  console.log(stringToSign);
+
+  const signature = crypto
+    .createSign("RSA-SHA256")
+    .update(stringToSign)
+    .sign(privateKey, "base64");
+
+  const header = [
+    `keyId="${actor}#main-key"`,
+    `algorithm="rsa-sha256"`,
+    `headers="(request-target) host date"`,
+    `signature="${signature}"`,
+  ].join(", ");
+
+  return {
+    Date: date,
+    Host: parsed.host,
+    Signature: header,
+    Accept: "application/activity+json",
+  };
+}
+
+
+module.exports = {
+  signRequest,
+  signGetRequest,
+};
