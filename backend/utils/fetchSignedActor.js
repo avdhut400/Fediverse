@@ -12,6 +12,20 @@ const privateKey = fs.readFileSync(
 
 //new file
 
+
+console.log("========== SIGNED ACTOR GET ==========");
+console.log("Actor URL:", actorUrl);
+console.log("Host:", parsed.host);
+console.log("Date:", date);
+console.log("String To Sign:");
+console.log(stringToSign);
+console.log("Signature Header:", signatureHeader);
+console.log("Key ID:", `${actor}#main-key`);
+console.log("======================================");
+
+
+
+
 const fetchSignedActor = async (actorUrl, actorUsername) => {
   const parsed = new URL(actorUrl);
 
