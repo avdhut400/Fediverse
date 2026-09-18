@@ -9,6 +9,7 @@ const {
   getFollowers,
   getFollowing,
   deletePost,
+  resolveRemoteActor
 
 } = require("../controllers/activityPubController");
 
