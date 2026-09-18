@@ -26,5 +26,9 @@ router.get('/:username/inbox', inbox);
 // DELETE a post (only for owner)
 router.delete('/:id', verifyToken, deletePost);
 
+
+
+
+router.get("/remote/resolve", resolveRemoteActor);
 module.exports = router;
 
