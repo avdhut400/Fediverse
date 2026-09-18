@@ -57,11 +57,19 @@ const RemoteSearch = () => {
         return;
       }
 
-      const actorProfile = await axios.get(selfLink.href, {
-        headers: {
-          Accept: "application/activity+json",
-        },
-      });
+      // const actorProfile = await axios.get(selfLink.href, {
+      //   headers: {
+      //     Accept: "application/activity+json",
+      //   },
+      // });
+      const actorRes = await axios.get(
+          `${process.env.REACT_APP_API_URL}/remote/resolve`,
+          {
+            params: {
+              actorUrl: selfLink.href,
+            },
+          }
+        );
 
       setActor({
         ...actorProfile.data,
