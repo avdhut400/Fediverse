@@ -64,7 +64,7 @@ const RemoteSearch = () => {
       //   },
       // });
       const actorRes = await axios.get(
-          `${process.env.REACT_APP_API_URL}/remote/resolve`,
+          `${process.env.REACT_APP_API_URL}/users/remote/resolve`,
           {
             params: {
               actorUrl: selfLink.href,
