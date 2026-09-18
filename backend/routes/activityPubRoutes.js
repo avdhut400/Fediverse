@@ -30,5 +30,27 @@ router.delete('/:id', verifyToken, deletePost);
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+router.get("/remote/resolve", resolveRemoteActor);
+
+
+
+
+
+
 module.exports = router;
 
