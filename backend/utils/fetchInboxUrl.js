@@ -17,6 +17,10 @@ async function fetchInboxUrl(actorUrl) {
     }
   } catch (error) {
     console.error("❌ Error fetching inbox URL from:", actorUrl, error.message);
+     console.error("STATUS:", error.response?.status);
+  console.error("DATA:", error.response?.data);
+  console.error("HEADERS:", error.response?.headers);
+  console.error("URL:", actorUrl);
     return null;
   }
 }
