@@ -72,8 +72,13 @@ const RemoteSearch = () => {
           }
         );
 
+      // setActor({
+      //   ...actorProfile.data,
+      //   searchedHandle: cleanHandle,
+      //   domain,
+      // });
       setActor({
-        ...actorProfile.data,
+        ...actorRes.data,
         searchedHandle: cleanHandle,
         domain,
       });
