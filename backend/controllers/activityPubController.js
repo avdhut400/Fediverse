@@ -393,3 +393,123 @@ exports.outbox = async (req, res) => {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+exports.resolveRemoteActor = async (req, res) => {
+  try {
+    const { actorUrl } = req.query;
+
+    if (!actorUrl) {
+      return res.status(400).json({
+        message: "actorUrl is required",
+      });
+    }
+
+    const actorRes = await fetch(actorUrl, {
+      headers: {
+        Accept: "application/activity+json",
+        "User-Agent": "FediverseApp/1.0",
+      },
+    });
+
+    if (!actorRes.ok) {
+      const text = await actorRes.text();
+
+      console.error(
+        "Remote actor failed:",
+        actorRes.status,
+        text
+      );
+
+      return res.status(actorRes.status).json({
+        message: `Remote actor request failed: ${actorRes.status}`,
+      });
+    }
+
+    const actor = await actorRes.json();
+
+    return res.json(actor);
+  } catch (error) {
+    console.error("Remote actor error:", error);
+
+    return res.status(500).json({
+      message: "Failed to resolve remote actor",
+    });
+  }
+};
+
+
+
