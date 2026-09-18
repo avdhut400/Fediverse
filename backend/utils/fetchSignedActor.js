@@ -8,30 +8,11 @@ const privateKey = fs.readFileSync(
   "utf8"
 );
 
-
-
-//new file
-
-
-console.log("========== SIGNED ACTOR GET ==========");
-console.log("Actor URL:", actorUrl);
-console.log("Host:", parsed.host);
-console.log("Date:", date);
-console.log("String To Sign:");
-console.log(stringToSign);
-console.log("Signature Header:", signatureHeader);
-console.log("Key ID:", `${actor}#main-key`);
-console.log("======================================");
-
-
-
-
 const fetchSignedActor = async (actorUrl, actorUsername) => {
   const parsed = new URL(actorUrl);
 
   const date = new Date().toUTCString();
 
-  // Signed GET request
   const stringToSign = [
     `(request-target): get ${parsed.pathname}`,
     `host: ${parsed.host}`,
@@ -51,6 +32,17 @@ const fetchSignedActor = async (actorUrl, actorUsername) => {
     `algorithm="rsa-sha256",` +
     `headers="(request-target) host date",` +
     `signature="${signature}"`;
+
+  // Debug logs
+  console.log("========== SIGNED ACTOR GET ==========");
+  console.log("Actor URL:", actorUrl);
+  console.log("Host:", parsed.host);
+  console.log("Date:", date);
+  console.log("String To Sign:");
+  console.log(stringToSign);
+  console.log("Key ID:", `${actor}#main-key`);
+  console.log("Signature Header:", signatureHeader);
+  console.log("======================================");
 
   const response = await axios.get(actorUrl, {
     headers: {
