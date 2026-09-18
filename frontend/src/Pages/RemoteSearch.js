@@ -19,69 +19,159 @@ const RemoteSearch = () => {
     return temporaryElement.textContent || temporaryElement.innerText || "";
   };
 
+  // const resolveActor = async () => {
+  //   const cleanHandle = handle.trim().replace(/^@/, "");
+  //   const parts = cleanHandle.split("@");
+
+  //   setError("");
+  //   setActor(null);
+  //   setFollowStatus("");
+
+  //   if (parts.length !== 2) {
+  //     setError("Enter the handle as username@domain");
+  //     return;
+  //   }
+
+  //   const [username, domain] = parts;
+
+  //   if (!username || !domain) {
+  //     setError("Enter the handle as username@domain");
+  //     return;
+  //   }
+
+  //   try {
+  //     setSearchLoading(true);
+
+  //     const resource = encodeURIComponent(`acct:${cleanHandle}`);
+
+  //     const webfingerRes = await axios.get(
+  //       `https://${domain}/.well-known/webfinger?resource=${resource}`
+  //     );
+
+  //     const selfLink = webfingerRes.data.links?.find(
+  //       (link) => link.rel === "self"
+  //     );
+
+  //     if (!selfLink?.href) {
+  //       setError("Actor profile URL was not found.");
+  //       return;
+  //     }
+
+  //     const actorProfile = await axios.get(selfLink.href, {
+  //       headers: {
+  //         Accept: "application/activity+json",
+  //       },
+  //     });
+
+  //     setActor({
+  //       ...actorProfile.data,
+  //       searchedHandle: cleanHandle,
+  //       domain,
+  //     });
+  //   } catch (err) {
+  //     console.error(
+  //       "Actor resolve failed:",
+  //       err.response?.data || err.message
+  //     );
+
+  //     setError(
+  //       err.response?.data?.message ||
+  //         "Remote user could not be found. Check the handle and try again."
+  //     );
+  //   } finally {
+  //     setSearchLoading(false);
+  //   }
+  // };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   const resolveActor = async () => {
-    const cleanHandle = handle.trim().replace(/^@/, "");
-    const parts = cleanHandle.split("@");
+  const cleanHandle = handle.trim().replace(/^@/, "");
+  const parts = cleanHandle.split("@");
 
-    setError("");
-    setActor(null);
-    setFollowStatus("");
+  setError("");
+  setActor(null);
+  setFollowStatus("");
 
-    if (parts.length !== 2) {
-      setError("Enter the handle as username@domain");
+  if (parts.length !== 2) {
+    setError("Enter the handle as username@domain");
+    return;
+  }
+
+  const [username, domain] = parts;
+
+  if (!username || !domain) {
+    setError("Enter the handle as username@domain");
+    return;
+  }
+
+  try {
+    setSearchLoading(true);
+
+    // 1. WebFinger
+    const resource = encodeURIComponent(`acct:${cleanHandle}`);
+
+    const webfingerRes = await axios.get(
+      `https://${domain}/.well-known/webfinger?resource=${resource}`
+    );
+
+    const selfLink = webfingerRes.data.links?.find(
+      (link) =>
+        link.rel === "self" &&
+        link.type === "application/activity+json"
+    );
+
+    if (!selfLink?.href) {
+      setError("Actor profile URL was not found.");
       return;
     }
 
-    const [username, domain] = parts;
-
-    if (!username || !domain) {
-      setError("Enter the handle as username@domain");
-      return;
-    }
-
-    try {
-      setSearchLoading(true);
-
-      const resource = encodeURIComponent(`acct:${cleanHandle}`);
-
-      const webfingerRes = await axios.get(
-        `https://${domain}/.well-known/webfinger?resource=${resource}`
-      );
-
-      const selfLink = webfingerRes.data.links?.find(
-        (link) => link.rel === "self"
-      );
-
-      if (!selfLink?.href) {
-        setError("Actor profile URL was not found.");
-        return;
-      }
-
-      const actorProfile = await axios.get(selfLink.href, {
-        headers: {
-          Accept: "application/activity+json",
+    // 2. Ask OUR backend to fetch the remote Actor
+    const actorRes = await axios.get(
+      `${process.env.REACT_APP_API_URL}/remote/resolve`,
+      {
+        params: {
+          actorUrl: selfLink.href,
         },
-      });
+      }
+    );
 
-      setActor({
-        ...actorProfile.data,
-        searchedHandle: cleanHandle,
-        domain,
-      });
-    } catch (err) {
-      console.error(
-        "Actor resolve failed:",
-        err.response?.data || err.message
-      );
+    setActor({
+      ...actorRes.data,
+      searchedHandle: cleanHandle,
+      domain,
+    });
 
-      setError(
-        err.response?.data?.message ||
-          "Remote user could not be found. Check the handle and try again."
-      );
-    } finally {
-      setSearchLoading(false);
-    }
-  };
+  } catch (err) {
+    console.error(
+      "Actor resolve failed:",
+      err.response?.data || err.message
+    );
+
+    setError(
+      err.response?.data?.message ||
+        "Remote user could not be found. Check the handle and try again."
+    );
+  } finally {
+    setSearchLoading(false);
+  }
+};
 
   const sendFollow = async () => {
     if (!actor?.id) {
