@@ -11,6 +11,7 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:3000",
+   "https://fediverse-770uufeqe-avdhuts-projects-5b35d9f7.vercel.app",
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
