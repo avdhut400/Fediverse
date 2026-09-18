@@ -1,6 +1,9 @@
 
 const axios = require("axios");
 const User = require("../models/User");
+const { signGetRequest } = require("../utils/httpSignature");
+
+
 const { sendSignedRequest } = require("../utils/sendSignedRequest");
 
 exports.sendFollow = async (req, res) => {
@@ -12,9 +15,23 @@ exports.sendFollow = async (req, res) => {
     if (!localUser) return res.status(404).json({ error: "Local user not found" });
 
     // Step 1: Fetch remote actor to get inbox
-    const actorRes = await axios.get(remoteActorUrl, {
-      headers: { Accept: "application/activity+json" },
-    });
+    // const actorRes = await axios.get(remoteActorUrl, {
+    //   headers: { Accept: "application/activity+json" },
+    // });
+
+
+
+
+
+    // Step 1: Fetch remote actor to get inbox
+const actorRes = await axios.get(remoteActorUrl, {
+  headers: signGetRequest({
+    targetUrl: remoteActorUrl,
+    actor: localUser.actorUrl,
+  }),
+});
+
+    
 
     const remoteInbox = actorRes.data.inbox;
     if (!remoteInbox) return res.status(400).json({ error: "Remote inbox not found" });
