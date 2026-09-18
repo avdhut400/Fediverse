@@ -106,6 +106,11 @@ const followRoutes = require("./routes/followRoutes");
 const commentRoutes = require('./routes/comments');
 const chatbotRoutes = require('./routes/chat');
 
+
+const { resolveRemoteActor } = require("./controllers/activityPubController");
+
+
+
 app.use(express.json({ type: ['application/json', 'application/activity+json'] }));
 
 app.use(express.urlencoded({ extended: true }));
@@ -122,6 +127,14 @@ app.use(express.urlencoded({ extended: true }));
 
 // app.use("/replies", replyRoutes);
 app.use('/api/posts', commentRoutes);
+
+
+
+
+
+app.get("/remote/resolve", resolveRemoteActor);
+
+
 
 
 
