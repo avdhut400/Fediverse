@@ -5,6 +5,11 @@ const axios = require('axios');
 const { v4: uuidv4 } = require("uuid");
 const User = require('../models/User');
 const Post = require("../models/Post");
+
+
+const fetchSignedActor = require("../utils/fetchSignedActor");
+
+
 const signRequest  = require("../utils/httpSignature");
 const fetchInboxUrl = require("../utils/fetchInboxUrl");
 const {sendSignedRequest} = require("../utils/sendSignedRequest");
@@ -477,56 +482,41 @@ exports.resolveRemoteActor = async (req, res) => {
     console.log("1. Received actorUrl:", actorUrl);
 
     if (!actorUrl) {
-      console.log("❌ actorUrl is missing");
-
       return res.status(400).json({
         message: "actorUrl is required",
       });
     }
 
-    console.log("2. Fetching remote actor...");
-    console.log("   URL:", actorUrl);
+    const parsed = new URL(actorUrl);
 
-    const actorRes = await fetch(actorUrl, {
-      headers: {
-        Accept: "application/activity+json",
-        "User-Agent": "FediverseApp/1.0",
-      },
-    });
+    // Example:
+    // https://mastodon.social/users/avdhut_077
+    // pathname = /users/avdhut_077
 
-    console.log("3. Remote actor response received");
-    console.log("   Status:", actorRes.status);
-    console.log("   Status Text:", actorRes.statusText);
+    const pathParts = parsed.pathname.split("/").filter(Boolean);
 
-    console.log(
-      "4. Response Headers:",
-      Object.fromEntries(actorRes.headers)
-    );
+    const actorUsername = pathParts[pathParts.length - 1];
 
-    if (!actorRes.ok) {
-      const text = await actorRes.text();
-
-      console.error("❌ REMOTE ACTOR REQUEST FAILED");
-      console.error("   Status:", actorRes.status);
-      console.error("   Response Body:", text);
-
-      console.log("========== REMOTE ACTOR RESOLVE END ==========");
-
-      return res.status(actorRes.status).json({
-        message: `Remote actor request failed: ${actorRes.status}`,
-        remoteResponse: text,
+    if (!actorUsername) {
+      return res.status(400).json({
+        message: "Could not determine remote actor username",
       });
     }
 
-    const actor = await actorRes.json();
+    console.log("2. Remote actor username:", actorUsername);
+    console.log("3. Fetching signed actor:", actorUrl);
 
-    console.log("5. Actor successfully received");
+    const actor = await fetchSignedActor(
+      actorUrl,
+      "avdhut"
+    );
+
+    console.log("4. Actor successfully received");
     console.log("   Actor ID:", actor.id);
     console.log("   Username:", actor.preferredUsername);
     console.log("   Type:", actor.type);
     console.log("   Inbox:", actor.inbox);
     console.log("   Public Key ID:", actor.publicKey?.id);
-    console.log("   Public Key Owner:", actor.publicKey?.owner);
 
     console.log("========== REMOTE ACTOR RESOLVE SUCCESS ==========");
 
@@ -534,8 +524,18 @@ exports.resolveRemoteActor = async (req, res) => {
 
   } catch (error) {
     console.error("❌ REMOTE ACTOR RESOLVE ERROR");
+
     console.error("Error message:", error.message);
-    console.error("Error stack:", error.stack);
+
+    if (error.response) {
+      console.error("Remote status:", error.response.status);
+      console.error("Remote response:", error.response.data);
+
+      return res.status(error.response.status).json({
+        message: `Remote actor request failed: ${error.response.status}`,
+        remoteResponse: error.response.data,
+      });
+    }
 
     return res.status(500).json({
       message: "Failed to resolve remote actor",
