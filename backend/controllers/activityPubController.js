@@ -470,13 +470,22 @@ exports.outbox = async (req, res) => {
 
 exports.resolveRemoteActor = async (req, res) => {
   try {
+    console.log("========== REMOTE ACTOR RESOLVE START ==========");
+
     const { actorUrl } = req.query;
 
+    console.log("1. Received actorUrl:", actorUrl);
+
     if (!actorUrl) {
+      console.log("❌ actorUrl is missing");
+
       return res.status(400).json({
         message: "actorUrl is required",
       });
     }
+
+    console.log("2. Fetching remote actor...");
+    console.log("   URL:", actorUrl);
 
     const actorRes = await fetch(actorUrl, {
       headers: {
@@ -485,31 +494,52 @@ exports.resolveRemoteActor = async (req, res) => {
       },
     });
 
+    console.log("3. Remote actor response received");
+    console.log("   Status:", actorRes.status);
+    console.log("   Status Text:", actorRes.statusText);
+
+    console.log(
+      "4. Response Headers:",
+      Object.fromEntries(actorRes.headers)
+    );
+
     if (!actorRes.ok) {
       const text = await actorRes.text();
 
-      console.error(
-        "Remote actor failed:",
-        actorRes.status,
-        text
-      );
+      console.error("❌ REMOTE ACTOR REQUEST FAILED");
+      console.error("   Status:", actorRes.status);
+      console.error("   Response Body:", text);
+
+      console.log("========== REMOTE ACTOR RESOLVE END ==========");
 
       return res.status(actorRes.status).json({
         message: `Remote actor request failed: ${actorRes.status}`,
+        remoteResponse: text,
       });
     }
 
     const actor = await actorRes.json();
 
+    console.log("5. Actor successfully received");
+    console.log("   Actor ID:", actor.id);
+    console.log("   Username:", actor.preferredUsername);
+    console.log("   Type:", actor.type);
+    console.log("   Inbox:", actor.inbox);
+    console.log("   Public Key ID:", actor.publicKey?.id);
+    console.log("   Public Key Owner:", actor.publicKey?.owner);
+
+    console.log("========== REMOTE ACTOR RESOLVE SUCCESS ==========");
+
     return res.json(actor);
+
   } catch (error) {
-    console.error("Remote actor error:", error);
+    console.error("❌ REMOTE ACTOR RESOLVE ERROR");
+    console.error("Error message:", error.message);
+    console.error("Error stack:", error.stack);
 
     return res.status(500).json({
       message: "Failed to resolve remote actor",
+      error: error.message,
     });
   }
 };
-
-
-
