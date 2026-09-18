@@ -9,7 +9,7 @@ const {
   getFollowers,
   getFollowing,
   deletePost,
-  resolveRemoteActor
+  // resolveRemoteActor
 } = require("../controllers/activityPubController");
 
 const { verifyToken } = require("../middleware/authMiddleware");
@@ -30,6 +30,6 @@ router.delete('/:id', verifyToken, deletePost);
 
 
 
-router.get("/remote/resolve", resolveRemoteActor);
+// router.get("/remote/resolve", resolveRemoteActor);
 module.exports = router;
 
