@@ -107,7 +107,7 @@ const commentRoutes = require('./routes/comments');
 const chatbotRoutes = require('./routes/chat');
 
 
-const { resolveRemoteActor } = require("./controllers/activityPubController");
+// const { resolveRemoteActor } = require("./controllers/activityPubController");
 
 
 
@@ -132,7 +132,7 @@ app.use('/api/posts', commentRoutes);
 
 
 
-app.get("/remote/resolve", resolveRemoteActor);
+// app.get("/remote/resolve", resolveRemoteActor);
 
 
 
