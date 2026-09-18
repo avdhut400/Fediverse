@@ -332,63 +332,63 @@ exports.outbox = async (req, res) => {
 
 
 
-exports.resolveRemoteActor = async (req, res) => {
-  try {
-    const handle = req.query.handle?.trim().replace(/^@/, "");
+// exports.resolveRemoteActor = async (req, res) => {
+//   try {
+//     const handle = req.query.handle?.trim().replace(/^@/, "");
 
-    if (!handle || !handle.includes("@")) {
-      return res.status(400).json({
-        message: "Invalid handle"
-      });
-    }
+//     if (!handle || !handle.includes("@")) {
+//       return res.status(400).json({
+//         message: "Invalid handle"
+//       });
+//     }
 
-    const [username, domain] = handle.split("@");
+//     const [username, domain] = handle.split("@");
 
-    // 1. WebFinger
-    const resource = encodeURIComponent(`acct:${handle}`);
+//     // 1. WebFinger
+//     const resource = encodeURIComponent(`acct:${handle}`);
 
-    const webfingerRes = await axios.get(
-      `https://${domain}/.well-known/webfinger?resource=${resource}`,
-      {
-        headers: {
-          Accept: "application/jrd+json"
-        }
-      }
-    );
+//     const webfingerRes = await axios.get(
+//       `https://${domain}/.well-known/webfinger?resource=${resource}`,
+//       {
+//         headers: {
+//           Accept: "application/jrd+json"
+//         }
+//       }
+//     );
 
-    const selfLink = webfingerRes.data.links?.find(
-      link =>
-        link.rel === "self" &&
-        link.type === "application/activity+json"
-    );
+//     const selfLink = webfingerRes.data.links?.find(
+//       link =>
+//         link.rel === "self" &&
+//         link.type === "application/activity+json"
+//     );
 
-    if (!selfLink?.href) {
-      return res.status(404).json({
-        message: "Actor not found"
-      });
-    }
+//     if (!selfLink?.href) {
+//       return res.status(404).json({
+//         message: "Actor not found"
+//       });
+//     }
 
-    // 2. Fetch Actor
-    const actorRes = await axios.get(selfLink.href, {
-      headers: {
-        Accept: "application/activity+json"
-      }
-    });
+//     // 2. Fetch Actor
+//     const actorRes = await axios.get(selfLink.href, {
+//       headers: {
+//         Accept: "application/activity+json"
+//       }
+//     });
 
-    return res.json(actorRes.data);
+//     return res.json(actorRes.data);
 
-  } catch (error) {
-    console.error(
-      "Remote actor resolve error:",
-      error.response?.status,
-      error.response?.data || error.message
-    );
+//   } catch (error) {
+//     console.error(
+//       "Remote actor resolve error:",
+//       error.response?.status,
+//       error.response?.data || error.message
+//     );
 
-    return res.status(500).json({
-      message: "Failed to resolve remote user"
-    });
-  }
-};
+//     return res.status(500).json({
+//       message: "Failed to resolve remote user"
+//     });
+//   }
+// };
 
 
 
