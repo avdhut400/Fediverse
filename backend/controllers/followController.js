@@ -183,30 +183,30 @@ exports.removeRemoteFollower = async (req, res) => {
       });
     }
 
-    // const actorRes = await axios.get(remoteActorUrl, {
-    //   headers: {
-    //     Accept: "application/activity+json",
-    //   },
-    // });
-
-
-
-
-
-
-
-
-
-
-
-
-
     const actorRes = await axios.get(remoteActorUrl, {
-            headers: signGetRequest({
-              targetUrl: remoteActorUrl,
-              actor: localUser.actorUrl,
-            }),
-          });
+      headers: {
+        Accept: "application/activity+json",
+      },
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // const actorRes = await axios.get(remoteActorUrl, {
+    //         headers: signGetRequest({
+    //           targetUrl: remoteActorUrl,
+    //           actor: localUser.actorUrl,
+    //         }),
+    //       });
 
     const remoteInbox = actorRes.data.inbox;
 
