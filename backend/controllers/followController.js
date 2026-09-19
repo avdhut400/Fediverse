@@ -79,11 +79,32 @@ exports.sendUnfollow = async (req, res) => {
     }
 
     // Step 1: Fetch remote actor inbox
+    // const actorRes = await axios.get(remoteActorUrl, {
+    //   headers: {
+    //     Accept: "application/activity+json",
+    //   },
+    // });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     const actorRes = await axios.get(remoteActorUrl, {
-      headers: {
-        Accept: "application/activity+json",
-      },
-    });
+          headers: signGetRequest({
+            targetUrl: remoteActorUrl,
+            actor: localUser.actorUrl,
+          }),
+        });
 
     const remoteInbox = actorRes.data.inbox;
 
@@ -162,11 +183,30 @@ exports.removeRemoteFollower = async (req, res) => {
       });
     }
 
+    // const actorRes = await axios.get(remoteActorUrl, {
+    //   headers: {
+    //     Accept: "application/activity+json",
+    //   },
+    // });
+
+
+
+
+
+
+
+
+
+
+
+
+
     const actorRes = await axios.get(remoteActorUrl, {
-      headers: {
-        Accept: "application/activity+json",
-      },
-    });
+            headers: signGetRequest({
+              targetUrl: remoteActorUrl,
+              actor: localUser.actorUrl,
+            }),
+          });
 
     const remoteInbox = actorRes.data.inbox;
 
