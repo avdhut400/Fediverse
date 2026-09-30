@@ -5,6 +5,9 @@ It allows local and remote users (e.g., Mastodon users) to follow, interact, and
 
 This project demonstrates real-world implementation of distributed systems, federation, and open social networking standards.
 
+<img width="4842" height="2896" alt="architecture diagram of fediverse" src="https://github.com/user-attachments/assets/86bf86f1-fc20-4a14-a88e-939b5972a922" />
+
+
 ---
 
 ## 🔥 Why This Project?
