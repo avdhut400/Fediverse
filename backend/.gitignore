@@ -1,5 +1,5 @@
 # Node.js
-node_modules/       # optional, but recommended
+node_modules/       
 npm-debug.log
 yarn-error.log
 
